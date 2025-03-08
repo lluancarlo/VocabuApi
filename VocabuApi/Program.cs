@@ -17,16 +17,16 @@ public class Program
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        //if (app.Environment.IsDevelopment())
+        //{
+        //}
+
+        app.MapOpenApi();
+        app.MapScalarApiReference(options =>
         {
-            app.MapOpenApi();
-            app.MapScalarApiReference(options =>
-            {
-                options.WithTitle("VocabuApi");
-                options.WithTheme(ScalarTheme.BluePlanet);
-                options.WithSidebar(true);
-            });
-        }
+            options.WithTitle("VocabuApi");
+            options.WithTheme(ScalarTheme.BluePlanet);
+        });
 
         app.UseHttpsRedirection();
 

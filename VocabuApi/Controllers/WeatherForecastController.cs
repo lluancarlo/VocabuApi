@@ -30,9 +30,9 @@ public class WeatherForecastController : ControllerBase
         .ToArray();
     }
 
-    [HttpGet("GetHelloWorld")]
-    public string GetHelloWorld()
+    [HttpGet("Mariana")]
+    public string GetMariana()
     {
-        return "Hello World!";
+        return "Ti amo amore <3";
     }
 }
