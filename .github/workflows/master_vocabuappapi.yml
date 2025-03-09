@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - VocabuAppApi
+name: PRODUCTION
 
 on:
   push:
@@ -57,6 +57,10 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_4529441C30BE475EBB1529CC6DBC38A0 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_450EC3F315394CEFA4080AACF31D1E88 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DCEDBEBB51BB48488FC013874E567C74 }}
+
+      - name: Set JWT secret in Azure App Service
+        run: |
+          az webapp config appsettings set --name VocabuAppApi --resource-group VocabuApp --settings JWT_SECRET=${{ secrets.JWT_SECRET }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
