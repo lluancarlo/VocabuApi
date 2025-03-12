@@ -21,7 +21,7 @@ public class LoginCommand : IRequest<ApiResponse<string>>
         public async Task<ApiResponse<string>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             // Simulação de autenticação (substitua por lógica real)
-            if (request.Email == "user@example.com" && request.Password == "password")
+            if (request.Email == "admin" && request.Password == "123")
             {
                 var token = await _jwtService.GenerateToken(request.Email);
                 return ApiResponse<string>.Ok(token);
