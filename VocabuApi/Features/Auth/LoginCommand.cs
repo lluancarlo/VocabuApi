@@ -11,9 +11,9 @@ public class LoginCommand : IRequest<ApiResponse<string>>
 
     public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse<string>>
     {
-        private readonly IJwtService _jwtService;
+        private readonly JwtService _jwtService;
 
-        public LoginCommandHandler(IJwtService jwtService)
+        public LoginCommandHandler(JwtService jwtService)
         {
             _jwtService = jwtService;
         }
