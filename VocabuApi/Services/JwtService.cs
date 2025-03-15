@@ -5,12 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace VocabuApi.Services;
 
-public interface IJwtService
-{
-    Task<string> GenerateToken(string email);
-}
-
-public class JwtService : IJwtService
+public class JwtService
 {
     private readonly IConfiguration _configuration;
 
