@@ -1,4 +1,4 @@
-﻿namespace VocabuApi.Common;
+﻿namespace Vocabu.API.Common;
 
 public class ApiResponse
 {

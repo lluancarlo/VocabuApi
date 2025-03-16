@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-namespace VocabuApi.Controllers;
+namespace Vocabu.API.Controllers;
 
 [Authorize]
 [ApiController]

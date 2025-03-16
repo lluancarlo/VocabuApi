@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Vocabu.DAL.Contexts;
 
-namespace Vocabu.DataAccessLayer;
+namespace Vocabu.DAL;
 
 public static class DataAccessLayerExtension
 {
@@ -10,7 +11,7 @@ public static class DataAccessLayerExtension
 
     public static void LoadServices(IServiceCollection serviceProvider, IConfiguration configuration)
     {
-        serviceProvider.AddDbContext<ApplicationDbContext>(options =>
+        serviceProvider.AddDbContext<DefaultDbContext>(options =>
         {
             var connection = configuration.GetConnectionString(DefaultConnection);
 
@@ -19,6 +20,7 @@ public static class DataAccessLayerExtension
 
             options.UseSqlServer(connection, options =>
             {
+                options.MigrationsAssembly("Vocabu.DAL");
                 options.EnableRetryOnFailure();
             });
         });

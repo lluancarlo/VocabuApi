@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VocabuApi.DataAccessLayer\Vocabu.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\Vocabu.DAL\Vocabu.DAL.csproj" />
   </ItemGroup>
 
 </Project>

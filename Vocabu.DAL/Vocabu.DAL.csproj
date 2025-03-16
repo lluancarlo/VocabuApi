@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Vocabu.Domain\Vocabu.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

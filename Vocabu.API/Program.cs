@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using Vocabu.DataAccessLayer;
+using Vocabu.DAL;
 using VocabuApi.Services;
 
-namespace VocabuApi;
+namespace Vocabu.API;
 
 public class Program
 {

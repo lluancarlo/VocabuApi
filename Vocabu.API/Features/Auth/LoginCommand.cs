@@ -1,8 +1,8 @@
 ﻿using MediatR;
-using VocabuApi.Common;
+using Vocabu.API.Common;
 using VocabuApi.Services;
 
-namespace VocabuApi.Features.Auth;
+namespace Vocabu.API.Features.Auth;
 
 public class LoginCommand : IRequest<ApiResponse<string>>
 {
@@ -27,7 +27,7 @@ public class LoginCommand : IRequest<ApiResponse<string>>
                 return ApiResponse<string>.Ok(token);
             }
 
-            throw new UnauthorizedAccessException("Credenciais inválidas");
+            return ApiResponse<string>.Error("Invalid credentials");
         }
     }
 }

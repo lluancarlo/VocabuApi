@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using VocabuApi.Common;
-using VocabuApi.Features.Auth;
+using Vocabu.API.Common;
+using Vocabu.API.Features.Auth;
+
+namespace Vocabu.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
