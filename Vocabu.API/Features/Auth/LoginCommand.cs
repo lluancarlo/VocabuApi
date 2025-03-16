@@ -1,33 +1,59 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Vocabu.API.Common;
-using VocabuApi.Services;
+using Vocabu.BL.Services;
+using Vocabu.DAL.Entities;
 
 namespace Vocabu.API.Features.Auth;
 
-public class LoginCommand : IRequest<ApiResponse<string>>
+public class LoginCommand : IRequest<ApiResponse>
 {
-    public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
+    public required string Email { get; set; }
+    public required string Password { get; set; }
 
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse<string>>
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse>
     {
+        private readonly SignInManager<User> _signInManager;
+        private readonly UserManager<User> _userManager;
         private readonly JwtService _jwtService;
 
-        public LoginCommandHandler(JwtService jwtService)
+        public LoginCommandHandler(JwtService jwtService, SignInManager<User> signInManager, 
+            UserManager<User> userManager)
         {
+            _signInManager = signInManager;
+            _userManager = userManager;
             _jwtService = jwtService;
         }
 
-        public async Task<ApiResponse<string>> Handle(LoginCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse> Handle(LoginCommand command, CancellationToken ct)
         {
-            // Simulação de autenticação (substitua por lógica real)
-            if (request.Email == "admin" && request.Password == "123")
-            {
-                var token = await _jwtService.GenerateToken(request.Email);
-                return ApiResponse<string>.Ok(token);
-            }
+            var user = await _userManager.FindByEmailAsync(command.Email);
+            if (user == null)
+                return ApiResponse.Error("User does not exist");
 
-            return ApiResponse<string>.Error("Invalid credentials");
+            var result = await _signInManager.PasswordSignInAsync(user.Email, command.Password, false, false);
+
+            if (!result.Succeeded)
+                return ApiResponse.Error("Error while login: " + result.ToString());
+
+            var token = _jwtService.GenerateToken(user.Id, user.Email);
+            return ApiResponse<string>.Ok(token);
+        }
+    }
+
+    public class SignInCommandValidator : AbstractValidator<LoginCommand>
+    {
+        public SignInCommandValidator()
+        {
+            RuleFor(p => p.Email)
+                .NotEmpty()
+                .MaximumLength(254)
+                .EmailAddress();
+
+            RuleFor(p => p.Password)
+                .NotEmpty()
+                .MaximumLength(64);
         }
     }
 }

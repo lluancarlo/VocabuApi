@@ -17,8 +17,8 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ApiResponse> Login([FromBody] LoginCommand command)
-    {
-        return await _mediator.Send(command);
-    }
+    public async Task<ApiResponse> Login([FromBody] LoginCommand command) => await _mediator.Send(command);
+
+    [HttpPost("SignIn")]
+    public async Task<ApiResponse> SignIn([FromBody] SignInCommand command) => await _mediator.Send(command);
 }

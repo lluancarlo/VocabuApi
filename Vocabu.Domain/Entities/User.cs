@@ -1,12 +1,14 @@
-﻿namespace Vocabu.DAL.Entities;
+﻿using Microsoft.AspNetCore.Identity;
 
-public record User
+namespace Vocabu.DAL.Entities;
+
+public class User : IdentityUser<Guid>
 {
-    public Guid Id { get; set; }
-    public required string Email { get; set; }
-    public required string Password { get; set; }
+    //public Guid Id { get; set; }
+    //public required string Email { get; set; }
+    //public required string Password { get; set; }
     public required string Name { get; set; }
 
-    public Guid CountryId { get; set; }
-    public virtual required Country Country { get; set; }
+    public Guid? CountryId { get; set; }
+    public virtual Country? Country { get; set; }
 }

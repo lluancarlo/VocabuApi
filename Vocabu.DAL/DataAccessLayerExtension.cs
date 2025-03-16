@@ -7,7 +7,7 @@ namespace Vocabu.DAL;
 
 public static class DataAccessLayerExtension
 {
-    private const string DefaultConnection = nameof(DefaultConnection);
+    public const string DefaultConnection = nameof(DefaultConnection);
 
     public static void LoadServices(IServiceCollection serviceProvider, IConfiguration configuration)
     {
@@ -26,6 +26,5 @@ public static class DataAccessLayerExtension
         });
     }
 
-    [Serializable]
     private class ConnectionStringException : Exception { }
 }
