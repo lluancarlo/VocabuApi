@@ -13,7 +13,7 @@ public class ChangePasswordCommand : IRequest<CommandResponse>
     public required string CurrentPassword { get; set; }
     public required string NewPassword { get; set; }
 
-    public class ChangePasswordCommandHandler(JwtService _jwtService, SignInManager<User> _signInManager,  UserManager<User> _userManager) 
+    public class ChangePasswordCommandHandler(SignInManager<User> _signInManager,  UserManager<User> _userManager) 
         : IRequestHandler<ChangePasswordCommand, CommandResponse>
     {
         public async Task<CommandResponse> Handle(ChangePasswordCommand command, CancellationToken ct)

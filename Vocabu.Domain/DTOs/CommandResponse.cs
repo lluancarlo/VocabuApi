@@ -30,7 +30,7 @@ public class CommandResponse
         new() { Success = false, Message = message, StatusCode = (int)HttpStatusCode.InternalServerError };
 
     public static CommandResponse ValidatorError(IEnumerable<string> message) =>
-        new() { Success = false, Message = string.Join(" \n ", message), (int)HttpStatusCode.Conflict };
+        new() { Success = false, Message = string.Join(" \n ", message), StatusCode = (int)HttpStatusCode.Conflict };
 
     public static CommandResponse Error(string message, HttpStatusCode statusCode) =>
         new() { Success = false, Message = message, StatusCode = (int)statusCode };
