@@ -16,21 +16,26 @@ public class JwtService
         _configuration = configuration;
     }
 
-    public string GenerateToken(Guid userId, string email)
+    public string GenerateToken(Guid userId, string email, ICollection<string> roles)
     {
         var appSettingsKey = _configuration["Jwt:Secret"];
         if (string.IsNullOrEmpty(appSettingsKey))
             throw new MissingAppSettingsConfigurationException();
+
+        var claims = new List<Claim> {
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Email, email)
+        };
+
+        foreach (var role in roles)
+            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
 
         var keyInBytes = Encoding.UTF8.GetBytes(appSettingsKey);
 
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
-            claims: new List<Claim> {
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                new Claim(ClaimTypes.Email, email)
-            },
+            claims: claims,
             expires: DateTime.UtcNow.AddHours(1),
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(keyInBytes), SecurityAlgorithms.HmacSha256)
         );

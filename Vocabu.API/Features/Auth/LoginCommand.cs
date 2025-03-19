@@ -7,44 +7,39 @@ using Vocabu.DAL.Entities;
 
 namespace Vocabu.API.Features.Auth;
 
-public class LoginCommand : IRequest<ApiResponse>
+public class LoginCommand : IRequest<CommandResponse>
 {
     public required string Email { get; set; }
     public required string Password { get; set; }
 
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse>
+    public class LoginCommandHandler(JwtService _jwtService, SignInManager<User> _signInManager, UserManager<User> _userManager) 
+        : IRequestHandler<LoginCommand, CommandResponse>
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
-        private readonly JwtService _jwtService;
-
-        public LoginCommandHandler(JwtService jwtService, SignInManager<User> signInManager, 
-            UserManager<User> userManager)
+        public async Task<CommandResponse> Handle(LoginCommand command, CancellationToken ct)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
-            _jwtService = jwtService;
-        }
+            var validatorResult = new LoginCommandValidator().Validate(command);
+            if (!validatorResult.IsValid)
+                return CommandResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
 
-        public async Task<ApiResponse> Handle(LoginCommand command, CancellationToken ct)
-        {
             var user = await _userManager.FindByEmailAsync(command.Email);
             if (user == null)
-                return ApiResponse.Error("User does not exist");
+                return CommandResponse.NotFound("User does not exist");
 
-            var result = await _signInManager.PasswordSignInAsync(user.Email, command.Password, false, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, command.Password, false);
 
             if (!result.Succeeded)
-                return ApiResponse.Error("Error while login: " + result.ToString());
+                return CommandResponse.Unauthorized("Error while login: " + result.ToString());
 
-            var token = _jwtService.GenerateToken(user.Id, user.Email);
-            return ApiResponse<string>.Ok(token);
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _jwtService.GenerateToken(user.Id, user.Email!, roles);
+
+            return CommandResponse<string>.Ok(token, "Login completed successfully.");
         }
     }
 
-    public class SignInCommandValidator : AbstractValidator<LoginCommand>
+    public class LoginCommandValidator : AbstractValidator<LoginCommand>
     {
-        public SignInCommandValidator()
+        public LoginCommandValidator()
         {
             RuleFor(p => p.Email)
                 .NotEmpty()

@@ -1,23 +1,28 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using Vocabu.API.Common;
 
 namespace Vocabu.API.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class DebugController : ControllerBase
+public class ConfigurationController : ControllerBase
 {
     private readonly IConfiguration _configuration;
 
-    public DebugController(IConfiguration configuration)
+    public ConfigurationController(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
-    [HttpGet("GetHelloWorld")]
-    public IActionResult GetHelloWorld() => Ok("Hello World!");
+    [HttpGet("GetStatus")]
+    public IActionResult GetHelloWorld()
+    {
+        var commandResult = CommandResponse.Ok("API online and ready to use!");
+        return StatusCode(commandResult.StatusCode, commandResult);
+    }
 
     [HttpGet("GetAppSettings")]
     public IActionResult GetAppSettings()

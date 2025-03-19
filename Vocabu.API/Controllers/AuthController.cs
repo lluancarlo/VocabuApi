@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Vocabu.API.Common;
 using Vocabu.API.Features.Auth;
 
 namespace Vocabu.API.Controllers;
@@ -17,8 +16,16 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ApiResponse> Login([FromBody] LoginCommand command) => await _mediator.Send(command);
+    public async Task<IActionResult> Login([FromBody] LoginCommand command)
+    {
+        var commandResult = await _mediator.Send(command);
+        return StatusCode(commandResult.StatusCode, commandResult);
+    }
 
     [HttpPost("SignIn")]
-    public async Task<ApiResponse> SignIn([FromBody] SignInCommand command) => await _mediator.Send(command);
+    public async Task<IActionResult> SignIn([FromBody] SignInCommand command)
+    {
+        var commandResult = await _mediator.Send(command);
+        return StatusCode(commandResult.StatusCode, commandResult);
+    }
 }

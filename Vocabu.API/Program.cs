@@ -23,7 +23,7 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-        builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
         // Swagger
         builder.Services.AddOpenApiDocument(options =>
