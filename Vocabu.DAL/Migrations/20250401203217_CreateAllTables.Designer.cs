@@ -12,8 +12,8 @@ using Vocabu.DAL.Contexts;
 namespace Vocabu.DAL.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    [Migration("20250316200551_AddAllAuthTables")]
-    partial class AddAllAuthTables
+    [Migration("20250401203217_CreateAllTables")]
+    partial class CreateAllTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
