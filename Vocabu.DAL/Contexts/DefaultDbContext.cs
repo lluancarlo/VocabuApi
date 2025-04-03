@@ -20,9 +20,7 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         builder.Entity<IdentityRole<Guid>>(e =>
         {
             e.ToTable("Roles");
-
             e.HasKey(p => p.Id);
-
             e.HasIndex(p => p.Id).IsUnique();
         });
 
@@ -34,9 +32,7 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         builder.Entity<IdentityUserClaim<Guid>>(e =>
         {
             e.ToTable("UserClaims");
-
             e.HasKey(p => p.Id);
-
             e.HasIndex(p => p.Id).IsUnique();
         });
 
@@ -53,28 +49,22 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         builder.Entity<IdentityRoleClaim<Guid>>(e =>
         {
             e.ToTable("RoleClaims");
-
             e.HasKey(p => p.Id);
-
             e.HasIndex(p => p.Id).IsUnique();
         });
 
         builder.Entity<User>(e =>
         {
             e.ToTable("Users");
-
             e.HasKey(p => p.Id);
-
-            e.HasIndex(p => p.Id).IsUnique();
-
+            e.HasIndex(p => p.Id)
+                .IsUnique();
             e.Property(p => p.Email)
                 .HasMaxLength(254);
-
             e.Property(p => p.Name)
                 .HasMaxLength(50);
-
             e.HasOne(p => p.Country)
-                .WithMany(t => t.Users)
+                .WithMany()
                 .HasForeignKey(p => p.CountryId)
                 .OnDelete(DeleteBehavior.NoAction);
         });
@@ -83,11 +73,24 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         {
             e.ToTable("Countries");
             e.HasKey(p => p.Id);
-
             e.Property(p => p.Name)
                 .HasMaxLength(50);
+            e.Property(p => p.Iso31661Numeric)
+                .HasMaxLength(3);
+            e.Property(p => p.Iso31661Alpha2)
+                .HasMaxLength(2);
+            e.Property(p => p.Iso31661Alpha3)
+                .HasMaxLength(3);
+            e.Property(p => p.Continent);
+        });
 
-            e.Property(p => p.Continent)
+        builder.Entity<Game>(e =>
+        {
+            e.ToTable("Games");
+            e.HasKey(p => p.Id);
+            e.Property(p => p.Name)
+                .HasMaxLength(50);
+            e.Property(p => p.Description)
                 .HasMaxLength(50);
         });
     }
