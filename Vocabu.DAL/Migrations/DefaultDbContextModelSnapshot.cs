@@ -182,9 +182,10 @@ namespace Vocabu.DAL.Migrations
                         .HasMaxLength(3)
                         .HasColumnType("nvarchar(3)");
 
-                    b.Property<int>("Iso31661Numeric")
+                    b.Property<string>("Iso31661Numeric")
+                        .IsRequired()
                         .HasMaxLength(3)
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(3)");
 
                     b.Property<string>("Name")
                         .IsRequired()

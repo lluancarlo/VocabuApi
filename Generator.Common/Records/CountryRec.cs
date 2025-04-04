@@ -1,4 +1,6 @@
-﻿namespace Generator.Common;
+﻿using Vocabu.DAL.Entities;
+
+namespace Generator.Common.Records;
 
 public class CountryRec
 {
@@ -23,6 +25,9 @@ public class CountryRec
     public record ResultCountry
     {
         public required ResultCountryName Name { get; set; }
+        public required string Cca2 { get; set; }
+        public required string Cca3 { get; set; }
+        public required string Ccn3 { get; set; }
         public required string[] Continents { get; set; }
     }
 }

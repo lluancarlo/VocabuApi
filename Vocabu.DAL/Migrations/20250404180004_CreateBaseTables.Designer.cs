@@ -12,8 +12,8 @@ using Vocabu.DAL.Contexts;
 namespace Vocabu.DAL.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    [Migration("20250401203217_CreateAllTables")]
-    partial class CreateAllTables
+    [Migration("20250404180004_CreateBaseTables")]
+    partial class CreateBaseTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -172,7 +172,41 @@ namespace Vocabu.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Continent")
+                    b.Property<int>("Continent")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Iso31661Alpha2")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("nvarchar(2)");
+
+                    b.Property<string>("Iso31661Alpha3")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("Iso31661Numeric")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries", "dbo");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.Game", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -184,7 +218,7 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries", "dbo");
+                    b.ToTable("Games", "dbo");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.User", b =>
@@ -320,16 +354,11 @@ namespace Vocabu.DAL.Migrations
             modelBuilder.Entity("Vocabu.DAL.Entities.User", b =>
                 {
                     b.HasOne("Vocabu.DAL.Entities.Country", "Country")
-                        .WithMany("Users")
+                        .WithMany()
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("Vocabu.DAL.Entities.Country", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

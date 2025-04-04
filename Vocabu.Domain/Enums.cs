@@ -12,4 +12,6 @@ public static class Enums
         Oceania = 5,
         SouthAmerica = 6
     }
+
+    public static T GetEnumByName<T>(string name) => (T)Enum.Parse(typeof(T), name.Trim());
 }

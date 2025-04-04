@@ -14,7 +14,6 @@ public static class DataAccessLayerExtension
         serviceProvider.AddDbContext<DefaultDbContext>(options =>
         {
             var connection = configuration.GetConnectionString(DefaultConnection);
-
             if (string.IsNullOrWhiteSpace(connection))
                 throw new ConnectionStringException();
 
