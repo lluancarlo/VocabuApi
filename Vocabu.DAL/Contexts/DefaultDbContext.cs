@@ -13,6 +13,7 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
     public DbSet<Game> Games { get; set; }
     public DbSet<Score> Score { get; set; }
     public DbSet<ScoreTransaction> ScoreTransaction { get; set; }
+    public DbSet<JobLog> JobLogs { get; set; }
     #endregion
 
     public DefaultDbContext(DbContextOptions<DefaultDbContext> options) : base(options)
@@ -155,6 +156,23 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
             e.HasOne(p => p.Score)
                 .WithMany()
                 .HasForeignKey(p => p.ScoreId);
+        });
+
+        builder.Entity<JobLog>(e =>
+        {
+            e.ToTable("JobLogs");
+            e.HasKey(j => j.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(j => j.JobName)
+                .HasMaxLength(100)
+                .IsRequired();
+            e.Property(j => j.LastRun)
+                .IsRequired();
+            e.Property(j => j.LastRunSuccess)
+                .IsRequired();
+            e.Property(j => j.Result)
+                .HasMaxLength(1000);
         });
     }
 }
