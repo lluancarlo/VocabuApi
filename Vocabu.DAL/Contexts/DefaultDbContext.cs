@@ -7,9 +7,18 @@ namespace Vocabu.DAL.Contexts;
 
 public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
+    #region DBSets
+    public DbSet<User> Users { get; set; }
+    public DbSet<Country> Countries { get; set; }
+    public DbSet<Game> Games { get; set; }
+    public DbSet<Score> Score { get; set; }
+    public DbSet<ScoreTransaction> ScoreTransaction { get; set; }
+    #endregion
+
     public DefaultDbContext(DbContextOptions<DefaultDbContext> options) : base(options)
     {
     }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -21,7 +30,8 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         {
             e.ToTable("Roles");
             e.HasKey(p => p.Id);
-            e.HasIndex(p => p.Id).IsUnique();
+            e.HasIndex(p => p.Id)
+                .IsUnique();
         });
 
         builder.Entity<IdentityUserRole<Guid>>(e =>
@@ -33,7 +43,8 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         {
             e.ToTable("UserClaims");
             e.HasKey(p => p.Id);
-            e.HasIndex(p => p.Id).IsUnique();
+            e.HasIndex(p => p.Id)
+                .IsUnique();
         });
 
         builder.Entity<IdentityUserLogin<Guid>>(e =>
@@ -50,7 +61,8 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         {
             e.ToTable("RoleClaims");
             e.HasKey(p => p.Id);
-            e.HasIndex(p => p.Id).IsUnique();
+            e.HasIndex(p => p.Id)
+                .IsUnique();
         });
 
         builder.Entity<User>(e =>
@@ -60,9 +72,13 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
             e.HasIndex(p => p.Id)
                 .IsUnique();
             e.Property(p => p.Email)
+                .IsRequired()
                 .HasMaxLength(254);
             e.Property(p => p.Name)
+                .IsRequired()
                 .HasMaxLength(50);
+            e.Property(p => p.CountryId)
+                .IsRequired();
             e.HasOne(p => p.Country)
                 .WithMany()
                 .HasForeignKey(p => p.CountryId)
@@ -73,25 +89,72 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
         {
             e.ToTable("Countries");
             e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
             e.Property(p => p.Name)
+                .IsRequired()
                 .HasMaxLength(50);
             e.Property(p => p.Iso31661Numeric)
+                .IsRequired()
                 .HasMaxLength(3);
             e.Property(p => p.Iso31661Alpha2)
+                .IsRequired()
                 .HasMaxLength(2);
             e.Property(p => p.Iso31661Alpha3)
+                .IsRequired()
                 .HasMaxLength(3);
-            e.Property(p => p.Continent);
+            e.Property(p => p.Continent)
+                .IsRequired();
         });
 
         builder.Entity<Game>(e =>
         {
             e.ToTable("Games");
             e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
             e.Property(p => p.Name)
+                .IsRequired()
                 .HasMaxLength(50);
             e.Property(p => p.Description)
+                .IsRequired()
                 .HasMaxLength(50);
+        });
+
+        builder.Entity<Score>(e =>
+        {
+            e.ToTable("Scores");
+            e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(p => p.Points)
+                .IsRequired()
+                .HasDefaultValue(0);
+            e.Property(p => p.UserId)
+                .IsRequired();
+            e.Property(p => p.GameId)
+                .IsRequired();
+            e.HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId);
+            e.HasOne(p => p.Game)
+                .WithMany()
+                .HasForeignKey(p => p.GameId);
+        });
+
+        builder.Entity<ScoreTransaction>(e =>
+        {
+            e.ToTable("ScoreTransactions");
+            e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(p => p.Points)
+                .IsRequired();
+            e.Property(p => p.ExecutedAt)
+                .IsRequired();
+            e.HasOne(p => p.Score)
+                .WithMany()
+                .HasForeignKey(p => p.ScoreId);
         });
     }
 }

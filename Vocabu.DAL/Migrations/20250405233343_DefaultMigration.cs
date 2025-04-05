@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Vocabu.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateBaseTables : Migration
+    public partial class DefaultMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -67,10 +67,10 @@ namespace Vocabu.DAL.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CountryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(254)", maxLength: 254, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(254)", maxLength: 254, nullable: false),
                     NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -113,6 +113,35 @@ namespace Vocabu.DAL.Migrations
                         column: x => x.RoleId,
                         principalSchema: "dbo",
                         principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Scores",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Points = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    GameId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Scores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Scores_Games_GameId",
+                        column: x => x.GameId,
+                        principalSchema: "dbo",
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Scores_Users_UserId",
+                        column: x => x.UserId,
+                        principalSchema: "dbo",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -211,6 +240,42 @@ namespace Vocabu.DAL.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ScoreTransactions",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Points = table.Column<int>(type: "int", nullable: false),
+                    ExecutedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ScoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScoreTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScoreTransactions_Scores_ScoreId",
+                        column: x => x.ScoreId,
+                        principalSchema: "dbo",
+                        principalTable: "Scores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Countries_Id",
+                schema: "dbo",
+                table: "Countries",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Games_Id",
+                schema: "dbo",
+                table: "Games",
+                column: "Id",
+                unique: true);
+
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_Id",
                 schema: "dbo",
@@ -238,6 +303,38 @@ namespace Vocabu.DAL.Migrations
                 column: "NormalizedName",
                 unique: true,
                 filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Scores_GameId",
+                schema: "dbo",
+                table: "Scores",
+                column: "GameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Scores_Id",
+                schema: "dbo",
+                table: "Scores",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Scores_UserId",
+                schema: "dbo",
+                table: "Scores",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreTransactions_Id",
+                schema: "dbo",
+                table: "ScoreTransactions",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreTransactions_ScoreId",
+                schema: "dbo",
+                table: "ScoreTransactions",
+                column: "ScoreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_Id",
@@ -296,11 +393,11 @@ namespace Vocabu.DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Games",
+                name: "RoleClaims",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
-                name: "RoleClaims",
+                name: "ScoreTransactions",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
@@ -320,7 +417,15 @@ namespace Vocabu.DAL.Migrations
                 schema: "dbo");
 
             migrationBuilder.DropTable(
+                name: "Scores",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
                 name: "Roles",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "Games",
                 schema: "dbo");
 
             migrationBuilder.DropTable(

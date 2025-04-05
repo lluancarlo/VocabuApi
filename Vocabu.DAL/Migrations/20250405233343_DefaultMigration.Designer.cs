@@ -12,8 +12,8 @@ using Vocabu.DAL.Contexts;
 namespace Vocabu.DAL.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    [Migration("20250404180004_CreateBaseTables")]
-    partial class CreateBaseTables
+    [Migration("20250405233343_DefaultMigration")]
+    partial class DefaultMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -197,6 +197,9 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("Countries", "dbo");
                 });
 
@@ -218,7 +221,64 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("Games", "dbo");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.Score", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Points")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Scores", "dbo");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.ScoreTransaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExecutedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ScoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("ScoreId");
+
+                    b.ToTable("ScoreTransactions", "dbo");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.User", b =>
@@ -234,10 +294,11 @@ namespace Vocabu.DAL.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("CountryId")
+                    b.Property<Guid>("CountryId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(254)
                         .HasColumnType("nvarchar(254)");
 
@@ -351,12 +412,43 @@ namespace Vocabu.DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vocabu.DAL.Entities.Score", b =>
+                {
+                    b.HasOne("Vocabu.DAL.Entities.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Vocabu.DAL.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Game");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.ScoreTransaction", b =>
+                {
+                    b.HasOne("Vocabu.DAL.Entities.Score", "Score")
+                        .WithMany()
+                        .HasForeignKey("ScoreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Score");
+                });
+
             modelBuilder.Entity("Vocabu.DAL.Entities.User", b =>
                 {
                     b.HasOne("Vocabu.DAL.Entities.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("Country");
                 });

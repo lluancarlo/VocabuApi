@@ -2,7 +2,7 @@
 
 namespace Vocabu.DAL.Entities;
 
-public record Country
+public class Country
 {
     public Guid Id { get; set; }
     public required string Name { get; set; }
