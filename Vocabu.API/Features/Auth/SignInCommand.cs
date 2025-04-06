@@ -49,6 +49,7 @@ public class SignInCommand : IRequest<CommandResponse>
                 UserName = command.Email,
                 Email = command.Email,
                 CountryId = countryId,
+                EmailConfirmed = true
             };
 
             var result = await userManager.CreateAsync(user, command.Password);

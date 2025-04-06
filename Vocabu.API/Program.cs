@@ -72,8 +72,10 @@ public class Program
             options.Password.RequireLowercase = false;
             options.Password.RequireUppercase = false;
             options.Password.RequireDigit = false;
-            options.Password.RequiredLength = 6;
-            options.Password.RequiredUniqueChars = 2;
+            options.Password.RequiredLength = 8;
+            options.SignIn.RequireConfirmedAccount = false;
+            options.SignIn.RequireConfirmedEmail = false;
+            options.SignIn.RequireConfirmedPhoneNumber = false;
         });
 
         var app = builder.Build();
