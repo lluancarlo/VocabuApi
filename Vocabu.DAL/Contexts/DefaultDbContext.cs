@@ -8,7 +8,6 @@ namespace Vocabu.DAL.Contexts;
 public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
     #region DBSets
-    public DbSet<User> Users { get; set; }
     public DbSet<Country> Countries { get; set; }
     public DbSet<Game> Games { get; set; }
     public DbSet<Score> Score { get; set; }

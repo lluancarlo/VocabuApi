@@ -14,9 +14,21 @@ public class SignInCommand : IRequest<CommandResponse>
     public required string Name { get; set; }
     public string? CountryId { get; set; }
 
-    public class SignInCommandHandler(JwtService _jwtService, SignInManager<User> _signInManager, UserManager<User> _userManager)
-        : IRequestHandler<SignInCommand, CommandResponse>
+    public class SignInCommandHandler : IRequestHandler<SignInCommand, CommandResponse>
     {
+        private readonly JwtService jwtService;
+        private readonly SignInManager<User> signInManager;
+        private readonly UserManager<User> userManager;
+
+        public SignInCommandHandler(JwtService _jwtService, 
+            SignInManager<User> _signInManager, 
+            UserManager<User> _userManager)
+        {
+            jwtService = _jwtService;
+            signInManager = _signInManager;
+            userManager = _userManager;
+        }
+
         public async Task<CommandResponse> Handle(SignInCommand command, CancellationToken ct)
         {
             var validatorResult = new SignInCommandValidator().Validate(command);
@@ -27,7 +39,7 @@ public class SignInCommand : IRequest<CommandResponse>
             if (!parseResult)
                 return CommandResponse.Conflict("CountryId is not a valid guid.");
 
-            var user = await _userManager.FindByEmailAsync(command.Email);
+            var user = await userManager.FindByEmailAsync(command.Email);
             if (user != null)
                 return CommandResponse.Conflict("Email already in use");
 
@@ -39,12 +51,12 @@ public class SignInCommand : IRequest<CommandResponse>
                 CountryId = countryId,
             };
 
-            var result = await _userManager.CreateAsync(user, command.Password);
+            var result = await userManager.CreateAsync(user, command.Password);
 
             if (!result.Succeeded)
                 return CommandResponse.InternalServerError("Error while creating user: " + string.Join(" | ", result.Errors.Select(s => $"{s.Code} - {s.Description}")));
 
-            var signInResult = await _signInManager.PasswordSignInAsync(user, command.Password, false, false);
+            var signInResult = await signInManager.PasswordSignInAsync(user, command.Password, false, false);
             if (!signInResult.Succeeded)
             {
                 if (signInResult.IsLockedOut)
@@ -54,10 +66,13 @@ public class SignInCommand : IRequest<CommandResponse>
                 return CommandResponse.Unauthorized("Invalid login attempt.");
             }
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var token = _jwtService.GenerateToken(user.Id, user.Email, roles);
+            var roles = await userManager.GetRolesAsync(user);
+            var serviceReponse = jwtService.GenerateToken(user.Id, user.Email, roles);
 
-            return CommandResponse<string>.Ok(token, "Login completed successfully.");
+            if (!serviceReponse.Success)
+                return CommandResponse.Error("Error while login: " + result.ToString(), System.Net.HttpStatusCode.InternalServerError);
+
+            return CommandResponse<string>.Ok(serviceReponse.Data!, "Login completed successfully.");
         }
     }
 
@@ -68,15 +83,18 @@ public class SignInCommand : IRequest<CommandResponse>
             RuleFor(p => p.Email)
                 .NotEmpty()
                 .MaximumLength(254)
-                .EmailAddress();
+                .EmailAddress()
+                .WithMessage("Email is invalid");
 
             RuleFor(p => p.Password)
                 .NotEmpty()
-                .MaximumLength(64);
+                .MaximumLength(64)
+                .WithMessage("Password is invalid");
 
             RuleFor(p => p.Name)
                 .NotEmpty()
-                .MaximumLength(50);
+                .MaximumLength(50)
+                .WithMessage("Name is invalid");
         }
     }
 }

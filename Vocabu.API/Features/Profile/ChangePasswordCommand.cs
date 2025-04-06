@@ -13,24 +13,33 @@ public class ChangePasswordCommand : IRequest<CommandResponse>
     public required string CurrentPassword { get; set; }
     public required string NewPassword { get; set; }
 
-    public class ChangePasswordCommandHandler(SignInManager<User> _signInManager,  UserManager<User> _userManager) 
-        : IRequestHandler<ChangePasswordCommand, CommandResponse>
+    public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, CommandResponse>
     {
+        private readonly SignInManager<User> signInManager;
+        private readonly UserManager<User> userManager;
+
+        public ChangePasswordCommandHandler(SignInManager<User> _signInManager, 
+            UserManager<User> _userManager)
+        {
+            signInManager = _signInManager;
+            userManager = _userManager;
+        }
+
         public async Task<CommandResponse> Handle(ChangePasswordCommand command, CancellationToken ct)
         {
             var validatorResult = new ChangePasswordCommandValidator().Validate(command);
             if (!validatorResult.IsValid)
                 return CommandResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
     
-            var user = await _userManager.FindByEmailAsync(command.Email);
+            var user = await userManager.FindByEmailAsync(command.Email);
             if (user == null)
                 return CommandResponse.NotFound("User not found.");
 
-            var passwordCheck = await _userManager.CheckPasswordAsync(user, command.CurrentPassword);
+            var passwordCheck = await userManager.CheckPasswordAsync(user, command.CurrentPassword);
             if (!passwordCheck)
                 return CommandResponse.BadRequest("Current password is incorrect.");
 
-            var result = await _userManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
+            var result = await userManager.ChangePasswordAsync(user, command.CurrentPassword, command.NewPassword);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
@@ -38,7 +47,7 @@ public class ChangePasswordCommand : IRequest<CommandResponse>
             }
 
             // Optional: Sign the user out everywhere or force re-login
-            await _signInManager.RefreshSignInAsync(user);
+            await signInManager.RefreshSignInAsync(user);
 
             return CommandResponse.Ok("Password changed successfully.");
         }
@@ -51,15 +60,18 @@ public class ChangePasswordCommand : IRequest<CommandResponse>
             RuleFor(p => p.Email)
                 .NotEmpty()
                 .MaximumLength(254)
-                .EmailAddress();
+                .EmailAddress()
+                .WithMessage("Email is invalid");
 
             RuleFor(p => p.CurrentPassword)
                 .NotEmpty()
-                .MaximumLength(64);
+                .MaximumLength(64)
+                .WithMessage("CurrentPassword is invalid");
 
             RuleFor(p => p.NewPassword)
                 .NotEmpty()
-                .MaximumLength(64);
+                .MaximumLength(64)
+                .WithMessage("NewPassword is invalid");
         }
     }
 }

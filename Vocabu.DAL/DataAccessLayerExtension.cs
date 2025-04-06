@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Vocabu.DAL.Contexts;
+using Vocabu.DAL.Repositories;
+using Vocabu.Domain.Interfaces;
 
 namespace Vocabu.DAL;
 
@@ -23,6 +25,8 @@ public static class DataAccessLayerExtension
                 options.EnableRetryOnFailure();
             });
         });
+
+        serviceProvider.AddScoped(typeof(IRepository<>), typeof(DefaultRepository<>));
     }
 
     private class ConnectionStringException : Exception { }

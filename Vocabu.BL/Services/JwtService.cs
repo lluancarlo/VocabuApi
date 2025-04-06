@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Vocabu.Domain.DTOs;
 
 namespace Vocabu.BL.Services;
 
@@ -15,11 +16,26 @@ public class JwtService
         _configuration = configuration;
     }
 
-    public string GenerateToken(Guid userId, string email, ICollection<string> roles)
+    public ServiceResponse<string> GenerateToken(Guid userId, string email, ICollection<string> roles)
     {
-        var appSettingsKey = _configuration["Jwt:Secret"];
-        if (string.IsNullOrEmpty(appSettingsKey))
-            throw new MissingAppSettingsConfigurationException();
+        var jwtSecret = _configuration["Jwt:Secret"];
+        if (string.IsNullOrEmpty(jwtSecret))
+            throw new MissingAppSettingsConfigurationException("Jwt:Secret");
+
+        var jwtIssuer = _configuration["Jwt:Issuer"];
+        if (string.IsNullOrEmpty(jwtIssuer))
+            throw new MissingAppSettingsConfigurationException("Jwt:Issuer is null");
+
+        var jwtAudience = _configuration["Jwt:Audience"];
+        if (string.IsNullOrEmpty(jwtAudience))
+            throw new MissingAppSettingsConfigurationException("Jwt:Audience is null");
+
+        var jwtExpires = _configuration["Jwt:ExpireInHours"];
+        if (string.IsNullOrEmpty(jwtExpires))
+            throw new MissingAppSettingsConfigurationException("Jwt:ExpireInHours is null");
+
+        if (!int.TryParse(jwtExpires, out var expireInHours))
+            throw new MissingAppSettingsConfigurationException("Jwt:ExpireInHours should be a int value");
 
         var claims = new List<Claim> {
             new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
@@ -29,18 +45,18 @@ public class JwtService
         foreach (var role in roles)
             claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
 
-        var keyInBytes = Encoding.UTF8.GetBytes(appSettingsKey);
+        var keyInBytes = Encoding.UTF8.GetBytes(jwtSecret);
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: jwtIssuer,
+            audience: jwtAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: DateTime.UtcNow.AddHours(expireInHours),
             signingCredentials: new SigningCredentials(new SymmetricSecurityKey(keyInBytes), SecurityAlgorithms.HmacSha256)
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return ServiceResponse<string>.Ok(new JwtSecurityTokenHandler().WriteToken(token));
     }
 }
 
-class MissingAppSettingsConfigurationException() : Exception();
+class MissingAppSettingsConfigurationException(string? msg = null) : Exception(msg);

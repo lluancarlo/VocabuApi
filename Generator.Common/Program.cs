@@ -26,7 +26,7 @@ public class Program
 
         var database = DbContext.GetDataBaseService();
 
-        if (database.Set<Country>().AsNoTracking().Any())
+        if (database.Countries.AsNoTracking().AsNoTracking().Any())
         {
             Console.WriteLine($" -> Cannot run {nameof(RunCountryGenerator)}: country table is not empty!");
             return;
@@ -46,19 +46,19 @@ public class Program
 
                     if (result != null)
                         foreach (var c in result)
-                            countryList.Add(new Country
-                            {
-                                Id = Guid.NewGuid(),
-                                Name = c.Name.Common ?? string.Empty,
-                                Iso31661Alpha2 = c.Cca2 ?? string.Empty,
-                                Iso31661Alpha3 = c.Cca3 ?? string.Empty,
-                                Iso31661Numeric = c.Ccn3 ?? string.Empty,
-                                Continent = GetEnumByName<Continents>(c.Continents[0].Replace(" ", string.Empty))
-                            });
+                            countryList.Add(
+                                new Country(
+                                    c.Name.Common ?? string.Empty, 
+                                    c.Cca2, 
+                                    c.Cca3, 
+                                    c.Ccn3, 
+                                    GetEnumByName<Continents>(c.Continents[0].Replace(" ", string.Empty)))
+                                );
                 }
 
                 if (countryList.Count > 0)
                 {
+                    countryList = countryList.OrderBy(o => o.Name).ToList();
                     await database.Set<Country>().AddRangeAsync(countryList);
                     await database.SaveChangesAsync();
                 }

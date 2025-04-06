@@ -28,13 +28,6 @@ public static class DbContext
             })
             .Build();
 
-    private static IServiceScope GetScope()
-    {
-        if (_currentScope == null)
-            _currentScope = ConnectToDatabase().Services.CreateScope();
-
-        return _currentScope;
-    }
-
-    public static DefaultDbContext GetDataBaseService() => GetScope().ServiceProvider.GetRequiredService<DefaultDbContext>();
+    public static DefaultDbContext GetDataBaseService() => 
+        ConnectToDatabase().Services.CreateScope().ServiceProvider.GetRequiredService<DefaultDbContext>();
 }
