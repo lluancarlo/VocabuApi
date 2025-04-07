@@ -2,8 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
 WORKDIR /app
 
-# Copy solution and project files
-COPY *.sln .
+# Copy solution and project files (excluding Generator)
+COPY VocabuApi.sln .
 COPY Vocabu.API/*.csproj ./Vocabu.API/
 COPY Vocabu.BL/*.csproj ./Vocabu.BL/
 COPY Vocabu.DAL/*.csproj ./Vocabu.DAL/
@@ -12,7 +12,7 @@ COPY Vocabu.Domain/*.csproj ./Vocabu.Domain/
 # Restore NuGet packages
 RUN dotnet restore
 
-# Copy the full source code
+# Copy all source code
 COPY . .
 
 # Build and publish the application
