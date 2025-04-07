@@ -1,30 +1,33 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
+# Stage 1: Build the application
+FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
 
+# Copy solution and project files
+COPY *.sln .
+COPY Vocabu.API/*.csproj ./Vocabu.API/
+COPY Vocabu.BL/*.csproj ./Vocabu.BL/
+COPY Vocabu.DAL/*.csproj ./Vocabu.DAL/
+COPY Vocabu.Domain/*.csproj ./Vocabu.Domain/
 
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["VocabuApi/VocabuApi.csproj", "VocabuApi/"]
-RUN dotnet restore "./VocabuApi/VocabuApi.csproj"
+# Restore NuGet packages
+RUN dotnet restore
+
+# Copy the full source code
 COPY . .
-WORKDIR "/src/VocabuApi"
-RUN dotnet build "./VocabuApi.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./VocabuApi.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Build and publish the application
+WORKDIR /app/Vocabu.API
+RUN dotnet publish -c Release -o /out
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+# Stage 2: Runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "VocabuApi.dll"]
+
+# Copy published output from build stage
+COPY --from=build /out .
+
+# Expose the HTTP port
+EXPOSE 80
+
+# Start the application
+ENTRYPOINT ["dotnet", "Vocabu.API.dll"]
