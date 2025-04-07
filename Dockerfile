@@ -1,26 +1,30 @@
+# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-EXPOSE 80
-
-# Copy everything
-COPY . ./
-
-run ls
-
-WORKDIR /src
-
-run ls
+# Copy only csproj files first to leverage Docker caching
+COPY VocabuApi.sln ./
+COPY Vocabu.API/Vocabu.API.csproj Vocabu.API/
+COPY Vocabu.BL/Vocabu.BL.csproj Vocabu.BL/
+COPY Vocabu.DAL/Vocabu.DAL.csproj Vocabu.DAL/
+COPY Vocabu.Domain/Vocabu.Domain.csproj Vocabu.Domain/
+COPY Generator.Common/Generator.Common.csproj Generator.Common/
 
 # Restore dependencies
-RUN dotnet restore
+RUN dotnet restore VocabuApi.sln
 
-# Build and publish a release
-RUN dotnet publish -o release_build
+# Now copy all project files
+COPY . .
 
-# Build runtime image
+# Publish the API
+WORKDIR /src/Vocabu.API
+RUN dotnet publish -c Release -o /app
+
+# Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
+WORKDIR /app
 
-COPY --from=build /src/release_build .
+COPY --from=build /app ./
 
+EXPOSE 80
 ENTRYPOINT ["dotnet", "Vocabu.API.dll"]
