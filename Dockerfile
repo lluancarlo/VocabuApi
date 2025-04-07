@@ -6,7 +6,7 @@ EXPOSE 80
 # Copy everything
 COPY . ./
 
-pwd
+RUN pwd
 
 # Restore dependencies
 RUN dotnet restore
@@ -16,7 +16,6 @@ RUN dotnet publish -o release_build
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
-WORKDIR /src
 
 COPY --from=build /src/release_build .
 
