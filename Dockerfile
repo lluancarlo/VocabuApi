@@ -6,6 +6,8 @@ EXPOSE 80
 # Copy everything
 COPY . ./
 
+pwd
+
 # Restore dependencies
 RUN dotnet restore
 
