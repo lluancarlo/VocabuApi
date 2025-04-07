@@ -2,11 +2,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 
+run ls
+
 # Copy the solution file
 COPY . ./
 
+run ls
+
 # Restore dependencies
-RUN dotnet restore VocabuApi.sln
+RUN dotnet restore
 
 # Build and publish
 WORKDIR /app/Vocabu.API
