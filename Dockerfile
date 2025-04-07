@@ -1,12 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /src
+
 
 EXPOSE 80
 
 # Copy everything
 COPY . ./
 
-RUN pwd
+WORKDIR /src
 
 # Restore dependencies
 RUN dotnet restore
