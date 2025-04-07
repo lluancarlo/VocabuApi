@@ -1,12 +1,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-
+WORKDIR /src
 
 EXPOSE 80
 
 # Copy everything
 COPY . ./
 
+run ls
+
 WORKDIR /src
+
+run ls
 
 # Restore dependencies
 RUN dotnet restore
