@@ -1,25 +1,19 @@
-# Stage 1: Build the application
+# https://hub.docker.com/_/microsoft-dotnet
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-WORKDIR /app
+WORKDIR /source
 
-run ls
-
-# Copy the solution file
+# Copy the solution files
 COPY . ./
 
-run ls /app/Vocabu.API/
-
-# Restore dependencies
 RUN dotnet restore
 
-# Build and publish
-WORKDIR /app/Vocabu.API
-RUN dotnet publish -c Release -o /out
-
-# Stage 2: Create runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
-WORKDIR /app
-COPY --from=build /out .
-
-EXPOSE 80
-ENTRYPOINT ["dotnet", "Vocabu.API.dll"]
+## copy everything else and build app
+#COPY . ./
+#WORKDIR /source
+#RUN dotnet publish -c release -o /app --no-restore
+#
+## final stage/image
+#FROM mcr.microsoft.com/dotnet/aspnet:9.0
+#WORKDIR /app
+#COPY --from=build /app ./
+#ENTRYPOINT ["dotnet", "aspnetapp.dll"]
