@@ -2,33 +2,28 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0-preview AS build
 WORKDIR /app
 
-# Copy solution and project files
+# Copy solution file
 COPY VocabuApi.sln .
-COPY Vocabu.API/*.csproj ./Vocabu.API/
-COPY Vocabu.BL/*.csproj ./Vocabu.BL/
-COPY Vocabu.DAL/*.csproj ./Vocabu.DAL/
-COPY Vocabu.Domain/*.csproj ./Vocabu.Domain/
-COPY Generator.Common/*.csproj ./Generator.Common/
 
-# Restore NuGet packages
+# Copy all project folders (not just .csproj)
+COPY Vocabu.API/ ./Vocabu.API/
+COPY Vocabu.BL/ ./Vocabu.BL/
+COPY Vocabu.DAL/ ./Vocabu.DAL/
+COPY Vocabu.Domain/ ./Vocabu.Domain/
+COPY Generator.Common/ ./Generator.Common/
+
+# Restore dependencies
 RUN dotnet restore VocabuApi.sln
-
-# Copy all source code
-COPY . .
 
 # Build and publish the application
 WORKDIR /app/Vocabu.API
 RUN dotnet publish -c Release -o /out
 
-# Stage 2: Runtime image
+# Stage 2: Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-preview
 WORKDIR /app
-
-# Copy published output from build stage
 COPY --from=build /out .
 
-# Expose the HTTP port
 EXPOSE 80
 
-# Start the application
 ENTRYPOINT ["dotnet", "Vocabu.API.dll"]
