@@ -5,6 +5,10 @@ WORKDIR /source
 # Copy the solution files
 COPY . ./
 
+RUN chmod 777 .
+
+RUN ls -a
+
 RUN dotnet restore
 
 ## copy everything else and build app
