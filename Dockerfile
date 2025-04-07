@@ -8,6 +8,7 @@ COPY Vocabu.API/*.csproj ./Vocabu.API/
 COPY Vocabu.BL/*.csproj ./Vocabu.BL/
 COPY Vocabu.DAL/*.csproj ./Vocabu.DAL/
 COPY Vocabu.Domain/*.csproj ./Vocabu.Domain/
+COPY Generator.Common/*.csproj ./Generator.Common/
 
 # Restore NuGet packages
 RUN dotnet restore
