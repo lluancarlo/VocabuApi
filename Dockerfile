@@ -7,7 +7,7 @@ run ls
 # Copy the solution file
 COPY . ./
 
-run ls
+run ls /app/Vocabu.API/
 
 # Restore dependencies
 RUN dotnet restore
