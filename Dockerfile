@@ -13,21 +13,19 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-run ls
-
-COPY ["Vocabu.API/Vocabu.API.csproj", "Vocabu.API/"]
+COPY ["Vocabu.API/Vocabu.Api.csproj", "Vocabu.API/"]
 COPY ["Vocabu.BL/Vocabu.BL.csproj", "Vocabu.BL/"]
 COPY ["Vocabu.DAL/Vocabu.DAL.csproj", "Vocabu.DAL/"]
 COPY ["Vocabu.Domain/Vocabu.Domain.csproj", "Vocabu.Domain/"]
-RUN dotnet restore "./Vocabu.API/Vocabu.API.csproj"
+RUN dotnet restore "./Vocabu.API/Vocabu.Api.csproj"
 COPY . .
 WORKDIR "/src/Vocabu.API"
-RUN dotnet build "./Vocabu.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./Vocabu.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Vocabu.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Vocabu.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
