@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.API", "Vocabu.API/Vocabu.API.csproj", "{A8674874-F59C-41A0-850A-B54AB7CBD021}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.API", "Vocabu.API\Vocabu.API.csproj", "{A8674874-F59C-41A0-850A-B54AB7CBD021}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,13 +14,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.DAL", "Vocabu.DAL/Vocabu.DAL.csproj", "{9EE5461C-817B-4418-B859-C775274C7440}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.DAL", "Vocabu.DAL\Vocabu.DAL.csproj", "{9EE5461C-817B-4418-B859-C775274C7440}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.Domain", "Vocabu.Domain/Vocabu.Domain.csproj", "{8521E21D-FB2C-4DF2-BCA4-0B8AA492D908}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.Domain", "Vocabu.Domain\Vocabu.Domain.csproj", "{8521E21D-FB2C-4DF2-BCA4-0B8AA492D908}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.BL", "Vocabu.BL/Vocabu.BL.csproj", "{6E8BB796-4E17-49EC-80BF-E3FF9C6477BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.BL", "Vocabu.BL\Vocabu.BL.csproj", "{6E8BB796-4E17-49EC-80BF-E3FF9C6477BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Common", "Generator.Common/Generator.Common.csproj", "{4E6A34DD-FF06-4545-BB58-A010FB6373AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Common", "Generator.Common\Generator.Common.csproj", "{4E6A34DD-FF06-4545-BB58-A010FB6373AA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{33003051-98CB-451B-8543-78F9BA5C0E3E}"
 EndProject
