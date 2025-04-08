@@ -12,10 +12,13 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["./Vocabu.API/Vocabu.API.csproj", "Vocabu.API/"]
-COPY ["./Vocabu.BL/Vocabu.BL.csproj", "Vocabu.BL/"]
-COPY ["./Vocabu.DAL/Vocabu.DAL.csproj", "Vocabu.DAL/"]
-COPY ["./Vocabu.Domain/Vocabu.Domain.csproj", "Vocabu.Domain/"]
+
+run ls
+
+COPY ["Vocabu.API/Vocabu.API.csproj", "Vocabu.API/"]
+COPY ["Vocabu.BL/Vocabu.BL.csproj", "Vocabu.BL/"]
+COPY ["Vocabu.DAL/Vocabu.DAL.csproj", "Vocabu.DAL/"]
+COPY ["Vocabu.Domain/Vocabu.Domain.csproj", "Vocabu.Domain/"]
 RUN dotnet restore "./Vocabu.API/Vocabu.API.csproj"
 COPY . .
 WORKDIR "/src/Vocabu.API"
