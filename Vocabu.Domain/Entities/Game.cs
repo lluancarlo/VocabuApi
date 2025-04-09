@@ -1,14 +1,14 @@
-﻿namespace Vocabu.DAL.Entities;
+﻿using Vocabu.Domain.Entities;
 
-public class Game
+namespace Vocabu.DAL.Entities;
+
+public class Game : ImmutableEntity
 {
-    public Guid Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
 
     public Game(string name, string description)
     {
-        Id = Guid.NewGuid();
         Name = name;
         Description = description;
     }

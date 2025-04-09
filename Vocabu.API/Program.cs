@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-using System.Reflection;
 using Vocabu.BL;
 using Vocabu.DAL;
 using Vocabu.DAL.Contexts;
@@ -19,7 +18,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         BusinessLayerExtension.LoadServices(builder.Services);
-        DataAccessLayerExtension.LoadServices(builder.Services, builder.Configuration);
+        DataAccessLayerExtension.LoadServices<ApiDbContext>(builder.Services, builder.Configuration);
 
         builder.Services.AddControllers();
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
@@ -64,7 +63,7 @@ public class Program
 
         // Add Identity services (UserManager, SignInManager)
         builder.Services.AddIdentity<User, IdentityRole<Guid>>()
-            .AddEntityFrameworkStores<DefaultDbContext>()
+            .AddEntityFrameworkStores<ApiDbContext>()
             .AddDefaultTokenProviders();
         builder.Services.Configure<IdentityOptions>(options =>
         {

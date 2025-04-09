@@ -5,7 +5,7 @@ using Vocabu.DAL.Entities;
 
 namespace Vocabu.DAL.Contexts;
 
-public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
+public class ApiDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
     #region DBSets
     public DbSet<Country> Countries { get; set; }
@@ -15,10 +15,9 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
     public DbSet<JobLog> JobLogs { get; set; }
     #endregion
 
-    public DefaultDbContext(DbContextOptions<DefaultDbContext> options) : base(options)
+    public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
     {
     }
-
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -91,6 +90,8 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
             e.HasKey(p => p.Id);
             e.HasIndex(p => p.Id)
                 .IsUnique();
+            e.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
             e.Property(p => p.Name)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -113,6 +114,8 @@ public class DefaultDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid
             e.HasKey(p => p.Id);
             e.HasIndex(p => p.Id)
                 .IsUnique();
+            e.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
             e.Property(p => p.Name)
                 .IsRequired()
                 .HasMaxLength(50);

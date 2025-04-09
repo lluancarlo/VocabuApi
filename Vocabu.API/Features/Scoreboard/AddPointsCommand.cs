@@ -8,13 +8,13 @@ using Vocabu.Domain.Interfaces;
 
 namespace Vocabu.API.Features.Auth;
 
-public class AddPointsCommand : IRequest<CommandResponse>
+public class AddPointsCommand : IRequest<ApiResponse>
 {
     public required Guid UserId { get; set; }
-    public required Guid GameId { get; set; }
+    public required int GameId { get; set; }
     public required int Points { get; set; }
 
-    public class AddPointsCommandHandler : IRequestHandler<AddPointsCommand, CommandResponse>
+    public class AddPointsCommandHandler : IRequestHandler<AddPointsCommand, ApiResponse>
     {
         private readonly UserManager<User> _userManager;
         private readonly IRepository<Game> _gameRepo;
@@ -33,17 +33,17 @@ public class AddPointsCommand : IRequest<CommandResponse>
             _scoreTransactionRepo = scoreTransactionRepo;
         }
 
-        public async Task<CommandResponse> Handle(AddPointsCommand command, CancellationToken ct)
+        public async Task<ApiResponse> Handle(AddPointsCommand command, CancellationToken ct)
         {
             var validatorResult = new AddPointsCommandValidator().Validate(command);
             if (!validatorResult.IsValid)
-                return CommandResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
+                return ApiResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
 
             if (!await _userManager.Users.AsNoTracking().AnyAsync(u => u.Id == command.UserId, ct))
-                return CommandResponse.Error($"user {command.UserId} not found", System.Net.HttpStatusCode.NotFound);
+                return ApiResponse.Error($"user {command.UserId} not found", System.Net.HttpStatusCode.NotFound);
 
             if (!await _gameRepo.AsQueryable().AsNoTracking().AnyAsync(a => a.Id == command.GameId, ct))
-                return CommandResponse.Error($"game {command.GameId} not found", System.Net.HttpStatusCode.NotFound);
+                return ApiResponse.Error($"game {command.GameId} not found", System.Net.HttpStatusCode.NotFound);
 
             var score = await _scoreRepo.AsQueryable()
                 .FirstOrDefaultAsync(f => f.UserId.Equals(command.UserId) && f.GameId.Equals(command.GameId), ct);

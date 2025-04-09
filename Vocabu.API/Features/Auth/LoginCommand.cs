@@ -7,12 +7,12 @@ using Vocabu.DAL.Entities;
 
 namespace Vocabu.API.Features.Auth;
 
-public class LoginCommand : IRequest<CommandResponse>
+public class LoginCommand : IRequest<ApiResponse>
 {
     public required string Email { get; set; }
     public required string Password { get; set; }
 
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, CommandResponse>
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponse>
     {
         private readonly JwtService jwtService;
         private readonly SignInManager<User> signInManager;
@@ -27,26 +27,26 @@ public class LoginCommand : IRequest<CommandResponse>
             userManager = _userManager;
         }
 
-        public async Task<CommandResponse> Handle(LoginCommand command, CancellationToken ct)
+        public async Task<ApiResponse> Handle(LoginCommand command, CancellationToken ct)
         {
             var validatorResult = new LoginCommandValidator().Validate(command);
             if (!validatorResult.IsValid)
-                return CommandResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
+                return ApiResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
 
             var user = await userManager.FindByEmailAsync(command.Email);
             if (user == null)
-                return CommandResponse.NotFound("User does not exist");
+                return ApiResponse.NotFound("User does not exist");
 
             var result = await signInManager.CheckPasswordSignInAsync(user, command.Password, false);
 
             if (!result.Succeeded)
-                return CommandResponse.Unauthorized("Error while login: " + result.ToString());
+                return ApiResponse.Unauthorized("Error while login: " + result.ToString());
 
             var roles = await userManager.GetRolesAsync(user);
             var serviceReponse = jwtService.GenerateToken(user.Id, user.Email!, roles);
 
             if (!serviceReponse.Success)
-                return CommandResponse.Error("Error while login: " + result.ToString(), System.Net.HttpStatusCode.InternalServerError);
+                return ApiResponse.Error("Error while login: " + result.ToString(), System.Net.HttpStatusCode.InternalServerError);
 
             return CommandResponse<string>.Ok(serviceReponse.Data!, "Login completed successfully.");
         }

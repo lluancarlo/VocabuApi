@@ -1,8 +1,9 @@
-﻿namespace Vocabu.DAL.Entities;
+﻿using Vocabu.Domain.Entities;
 
-public class JobLog
+namespace Vocabu.DAL.Entities;
+
+public class JobLog : MutableEntity
 {
-    public Guid Id { get; set; }
     public string JobName { get; set; }
     public DateTime LastRun { get; set; }
     public bool LastRunSuccess { get; set; }

@@ -1,17 +1,20 @@
-﻿namespace Vocabu.DAL.Entities;
+﻿using Vocabu.Domain.Entities;
 
-public class Score
+namespace Vocabu.DAL.Entities;
+
+public class Score : MutableEntity
 {
-    public Guid Id { get; set; }
     public int Points { get; set; }
 
+    #region Join Entities
     public Guid UserId { get; set; }
     public virtual User? User { get; set; }
 
-    public Guid GameId { get; set; }
+    public int GameId { get; set; }
     public virtual Game? Game { get; set; }
+    #endregion
 
-    public Score(int points, Guid userId, Guid gameId)
+    public Score(int points, Guid userId, int gameId)
     {
         Id = Guid.NewGuid();
         Points = points;

@@ -11,22 +11,23 @@ public static class DataAccessLayerExtension
 {
     public const string DefaultConnection = nameof(DefaultConnection);
 
-    public static void LoadServices(IServiceCollection serviceProvider, IConfiguration configuration)
+    public static void LoadServices<TContext>(IServiceCollection serviceProvider, IConfiguration configuration) 
+        where TContext : DbContext
     {
-        serviceProvider.AddDbContext<DefaultDbContext>(options =>
+        serviceProvider.AddDbContext<TContext>(options =>
         {
             var connection = configuration.GetConnectionString(DefaultConnection);
             if (string.IsNullOrWhiteSpace(connection))
                 throw new ConnectionStringException();
 
-            options.UseSqlServer(connection, options =>
+            options.UseNpgsql(connection, options =>
             {
                 options.MigrationsAssembly("Vocabu.DAL");
                 options.EnableRetryOnFailure();
             });
         });
 
-        serviceProvider.AddScoped(typeof(IRepository<>), typeof(DefaultRepository<>));
+        serviceProvider.AddScoped(typeof(IRepository<>), typeof(ApiGenericRepository<>));
     }
 
     private class ConnectionStringException : Exception { }

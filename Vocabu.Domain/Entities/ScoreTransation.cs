@@ -1,13 +1,16 @@
-﻿namespace Vocabu.DAL.Entities;
+﻿using Vocabu.Domain.Entities;
 
-public class ScoreTransaction
+namespace Vocabu.DAL.Entities;
+
+public class ScoreTransaction : MutableEntity
 {
-    public Guid Id { get; set; }
     public int Points { get; set; }
     public DateTime ExecutedAt { get; set; }
 
+    #region Join Entities
     public Guid ScoreId { get; set; }
     public virtual Score? Score { get; set; }
+    #endregion
 
     public ScoreTransaction(int points, DateTime executedAt, Guid scoreId)
     {

@@ -7,14 +7,14 @@ using Vocabu.DAL.Entities;
 
 namespace Vocabu.API.Features.Auth;
 
-public class SignInCommand : IRequest<CommandResponse>
+public class SignInCommand : IRequest<ApiResponse>
 {
     public required string Email { get; set; }
     public required string Password { get; set; }
     public required string Name { get; set; }
-    public string? CountryId { get; set; }
+    public int CountryId { get; set; }
 
-    public class SignInCommandHandler : IRequestHandler<SignInCommand, CommandResponse>
+    public class SignInCommandHandler : IRequestHandler<SignInCommand, ApiResponse>
     {
         private readonly JwtService jwtService;
         private readonly SignInManager<User> signInManager;
@@ -29,49 +29,45 @@ public class SignInCommand : IRequest<CommandResponse>
             userManager = _userManager;
         }
 
-        public async Task<CommandResponse> Handle(SignInCommand command, CancellationToken ct)
+        public async Task<ApiResponse> Handle(SignInCommand command, CancellationToken ct)
         {
             var validatorResult = new SignInCommandValidator().Validate(command);
             if (!validatorResult.IsValid)
-                return CommandResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
-
-            var parseResult = Guid.TryParse(command.CountryId, out var countryId);
-            if (!parseResult)
-                return CommandResponse.Conflict("CountryId is not a valid guid.");
+                return ApiResponse.ValidatorError(validatorResult.Errors.Select(s => s.ErrorMessage));
 
             var user = await userManager.FindByEmailAsync(command.Email);
             if (user != null)
-                return CommandResponse.Conflict("Email already in use");
+                return ApiResponse.Conflict("Email already in use");
 
             user = new User
             {
                 Name = command.Name,
                 UserName = command.Email,
                 Email = command.Email,
-                CountryId = countryId,
+                CountryId = command.CountryId,
                 EmailConfirmed = true
             };
 
             var result = await userManager.CreateAsync(user, command.Password);
 
             if (!result.Succeeded)
-                return CommandResponse.InternalServerError("Error while creating user: " + string.Join(" | ", result.Errors.Select(s => $"{s.Code} - {s.Description}")));
+                return ApiResponse.InternalServerError("Error while creating user: " + string.Join(" | ", result.Errors.Select(s => $"{s.Code} - {s.Description}")));
 
             var signInResult = await signInManager.PasswordSignInAsync(user, command.Password, false, false);
             if (!signInResult.Succeeded)
             {
                 if (signInResult.IsLockedOut)
-                    return CommandResponse.Forbidden("User account is locked.");
+                    return ApiResponse.Forbidden("User account is locked.");
                 if (signInResult.IsNotAllowed)
-                    return CommandResponse.Forbidden("User is not allowed to sign in.");
-                return CommandResponse.Unauthorized("Invalid login attempt.");
+                    return ApiResponse.Forbidden("User is not allowed to sign in.");
+                return ApiResponse.Unauthorized("Invalid login attempt.");
             }
 
             var roles = await userManager.GetRolesAsync(user);
             var serviceReponse = jwtService.GenerateToken(user.Id, user.Email, roles);
 
             if (!serviceReponse.Success)
-                return CommandResponse.Error("Error while login: " + result.ToString(), System.Net.HttpStatusCode.InternalServerError);
+                return ApiResponse.Error("Error while login: " + result.ToString(), System.Net.HttpStatusCode.InternalServerError);
 
             return CommandResponse<string>.Ok(serviceReponse.Data!, "Login completed successfully.");
         }

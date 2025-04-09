@@ -1,12 +1,13 @@
 ﻿namespace Vocabu.Domain.Interfaces;
 
-public interface IRepository<T> where T : class
+public interface IRepository<TEntity> 
+    where TEntity : class
 {
-    IQueryable<T> AsQueryable();
-    Task<IEnumerable<T>> GetAllAsync(bool tracking = true);
-    Task<T?> GetByIdAsync(Guid id, bool tracking = true);
-    Task AddAsync(T entity);
-    void Update(T entity);
-    void Delete(T entity);
+    IQueryable<TEntity> AsQueryable();
+    Task<IEnumerable<TEntity>> GetAllAsync(bool tracking = true);
+    Task<TEntity?> GetByIdAsync(Guid id, bool tracking = true);
+    Task AddAsync(TEntity entity);
+    void Update(TEntity entity);
+    void Delete(TEntity entity);
     Task<bool> SaveChangesAsync();
 }

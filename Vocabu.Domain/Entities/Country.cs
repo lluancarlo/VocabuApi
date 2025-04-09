@@ -1,10 +1,10 @@
-﻿using static Vocabu.Domain.Enums;
+﻿using Vocabu.Domain.Entities;
+using static Vocabu.Domain.Enums;
 
 namespace Vocabu.DAL.Entities;
 
-public class Country
+public class Country : ImmutableEntity
 {
-    public Guid Id { get; set; }
     public string Name { get; set; }
     public string Iso31661Alpha2 { get; set; }
     public string Iso31661Alpha3 { get; set; }
@@ -14,7 +14,6 @@ public class Country
     public Country(string name, string iso31661Alpha2, string iso31661Alpha3, 
         string iso31661Numeric, Continents continent)
     {
-        Id = Guid.NewGuid();
         Name = name;
         Iso31661Alpha2 = iso31661Alpha2;
         Iso31661Alpha3 = iso31661Alpha3;

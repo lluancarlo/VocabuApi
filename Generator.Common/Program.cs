@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using Vocabu.DAL;
+using Vocabu.DAL.Contexts;
 using Vocabu.DAL.Entities;
 using static Generator.Common.Records.CountryRec;
 using static Vocabu.Domain.Enums;
@@ -21,12 +25,17 @@ public class Program
     private static async Task RunCountryGenerator()
     {
         var baseUrl = "https://restcountries.com/v3.1/all?fields=name,cca2,cca3,ccn3continents";
-        var fields = new List<string> { "name","cca2","cca3","ccn3", "continents" };
-        var requestUrl = GetUrl(baseUrl, fields);
+        var fields = new List<string> { "name", "cca2", "cca3", "ccn3", "continents" };
 
-        var database = DbContext.GetDataBaseService();
+        var build = Host.CreateDefaultBuilder()
+            .ConfigureServices(static (context, services) =>
+            {
+                DataAccessLayerExtension.LoadServices<GeneratorDbContext>(services, context.Configuration);
+            })
+            .Build();
+        var database = build.Services.CreateScope().ServiceProvider.GetRequiredService<GeneratorDbContext>();   
 
-        if (database.Countries.AsNoTracking().AsNoTracking().Any())
+        if (database.Countries.AsNoTracking().Any())
         {
             Console.WriteLine($" -> Cannot run {nameof(RunCountryGenerator)}: country table is not empty!");
             return;
@@ -38,6 +47,7 @@ public class Program
 
             using (HttpClient client = new HttpClient())
             {
+                var requestUrl = GetUrl(baseUrl, fields);
                 var response = await client.GetAsync(requestUrl);
                 if (response != null)
                 {
@@ -84,7 +94,7 @@ public class Program
                 url += field + ',';
 
             if (url.EndsWith(','))
-                url.Remove(url.Length - 1);
+                url = url.Remove(url.Length - 1);
         }
 
         return url;
