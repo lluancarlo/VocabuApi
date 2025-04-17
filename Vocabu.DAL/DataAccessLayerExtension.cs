@@ -27,7 +27,7 @@ public static class DataAccessLayerExtension
             });
         });
 
-        serviceProvider.AddScoped(typeof(IRepository<>), typeof(ApiGenericRepository<>));
+        serviceProvider.AddScoped(typeof(IRepository<>), typeof(ApiRepository<>));
     }
 
     private class ConnectionStringException : Exception { }

@@ -25,5 +25,11 @@
     <ProjectReference Include="..\Vocabu.DAL\Vocabu.DAL.csproj" />
     <ProjectReference Include="..\Vocabu.Domain\Vocabu.Domain.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="WordLists\english.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

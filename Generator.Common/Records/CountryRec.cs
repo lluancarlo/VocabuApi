@@ -1,6 +1,4 @@
-﻿using Vocabu.DAL.Entities;
-
-namespace Generator.Common.Records;
+﻿namespace Generator.Common.Records;
 
 public class CountryRec
 {

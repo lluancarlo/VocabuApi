@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.Domain", "Vocabu.Dom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vocabu.BL", "Vocabu.BL\Vocabu.BL.csproj", "{6E8BB796-4E17-49EC-80BF-E3FF9C6477BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Common", "Generator.Common\Generator.Common.csproj", "{4E6A34DD-FF06-4545-BB58-A010FB6373AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BigGenerator", "Generator.Common\BigGenerator.csproj", "{4E6A34DD-FF06-4545-BB58-A010FB6373AA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{33003051-98CB-451B-8543-78F9BA5C0E3E}"
 EndProject

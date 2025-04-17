@@ -1,102 +1,38 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using Vocabu.DAL;
-using Vocabu.DAL.Contexts;
-using Vocabu.DAL.Entities;
-using static Generator.Common.Records.CountryRec;
-using static Vocabu.Domain.Enums;
+﻿using BigGenerator.Generators;
 
 namespace Generator.Common;
 
 public class Program
 {
-    static async Task Main(string[] args)
+    // Add generator here to make it run
+    private static readonly BaseGenerator[] GeneratorsToRun = [
+        new CountriesGenerator(),
+        new EnglishWordsGenerator(),
+    ];
+
+    static async Task<int> Main() => await RunAllGenerators();
+
+    private static async Task<int> RunAllGenerators()
     {
-        Console.WriteLine($" -> Running {nameof(RunCountryGenerator)} ...");
-        await RunCountryGenerator();
-        Console.WriteLine($" -> Finish {nameof(RunCountryGenerator)} !");
+        Console.WriteLine($" -> Running all generators project !");
+
+        foreach(var generator in GeneratorsToRun)
+            await RunGenerator(generator);
 
         Console.WriteLine(" -> Done all generations. Press Enter to close");
         Console.ReadKey();
+
+        return 0;
     }
 
-    private static async Task RunCountryGenerator()
+    private static async Task RunGenerator(BaseGenerator generator)
     {
-        var baseUrl = "https://restcountries.com/v3.1/all?fields=name,cca2,cca3,ccn3continents";
-        var fields = new List<string> { "name", "cca2", "cca3", "ccn3", "continents" };
+        var generatorName = generator.GetType().Name;
+        var response = await generator.Run();
 
-        var build = Host.CreateDefaultBuilder()
-            .ConfigureServices(static (context, services) =>
-            {
-                DataAccessLayerExtension.LoadServices<GeneratorDbContext>(services, context.Configuration);
-            })
-            .Build();
-        var database = build.Services.CreateScope().ServiceProvider.GetRequiredService<GeneratorDbContext>();   
-
-        if (database.Countries.AsNoTracking().Any())
-        {
-            Console.WriteLine($" -> Cannot run {nameof(RunCountryGenerator)}: country table is not empty!");
-            return;
-        }
-
-        try
-        {
-            var countryList = new List<Country>();
-
-            using (HttpClient client = new HttpClient())
-            {
-                var requestUrl = GetUrl(baseUrl, fields);
-                var response = await client.GetAsync(requestUrl);
-                if (response != null)
-                {
-                    var jsonString = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<IEnumerable<ResultCountry>>(jsonString);
-
-                    if (result != null)
-                        foreach (var c in result)
-                            countryList.Add(
-                                new Country(
-                                    c.Name.Common ?? string.Empty, 
-                                    c.Cca2, 
-                                    c.Cca3, 
-                                    c.Ccn3, 
-                                    GetEnumByName<Continents>(c.Continents[0].Replace(" ", string.Empty)))
-                                );
-                }
-
-                if (countryList.Count > 0)
-                {
-                    countryList = countryList.OrderBy(o => o.Name).ToList();
-                    await database.Set<Country>().AddRangeAsync(countryList);
-                    await database.SaveChangesAsync();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error when running {nameof(RunCountryGenerator)}: {ex.Message}");
-        }
-    }
-
-    private static string GetUrl(string baseUrl, IEnumerable<string>? fields)
-    {
-        var url = baseUrl;
-
-        if (fields != null)
-        {
-            url += url.EndsWith('?') ? string.Empty : ' ';
-
-            // Add fields to url
-            url += "fields=";
-            foreach (var field in fields)
-                url += field + ',';
-
-            if (url.EndsWith(','))
-                url = url.Remove(url.Length - 1);
-        }
-
-        return url;
+        if (response.Success)
+            Console.WriteLine($"   [ OKAY  ]   Generator {generatorName} done. {response.Message}   ");
+        else
+            Console.WriteLine($"   [ ERROR ]   Generator {generatorName} error message: {response.Message}   ");
     }
 }
