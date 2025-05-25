@@ -38,7 +38,7 @@ public class CountriesGenerator : BaseGenerator
                                 Iso31661Alpha3 = c.Cca3,
                                 Iso31661Numeric = c.Ccn3,
                                 Continent = GetEnumByName<Continents>(c.Continents[0].Replace(" ", string.Empty))
-                             });
+                            });
                 }
 
                 if (countryList.Count > 0)

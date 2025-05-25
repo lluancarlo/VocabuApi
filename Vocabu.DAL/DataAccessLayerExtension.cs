@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Vocabu.DAL.Contexts;
 using Vocabu.DAL.Repositories;
 using Vocabu.Domain.Interfaces;
 

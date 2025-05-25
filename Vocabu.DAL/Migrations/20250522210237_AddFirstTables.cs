@@ -7,17 +7,26 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Vocabu.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class AddFirstTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "dbo");
+                name: "Ref");
+
+            migrationBuilder.EnsureSchema(
+                name: "Config");
+
+            migrationBuilder.EnsureSchema(
+                name: "Auth");
+
+            migrationBuilder.EnsureSchema(
+                name: "Data");
 
             migrationBuilder.CreateTable(
                 name: "Countries",
-                schema: "dbo",
+                schema: "Ref",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -35,7 +44,7 @@ namespace Vocabu.DAL.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Games",
-                schema: "dbo",
+                schema: "Ref",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -50,7 +59,7 @@ namespace Vocabu.DAL.Migrations
 
             migrationBuilder.CreateTable(
                 name: "JobLogs",
-                schema: "dbo",
+                schema: "Config",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -65,8 +74,38 @@ namespace Vocabu.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Languages",
+                schema: "Ref",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Text = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Iso6391 = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
+                    Iso6392 = table.Column<string>(type: "character varying(3)", maxLength: 3, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Languages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PartsOfSpeech",
+                schema: "Ref",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Text = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PartsOfSpeech", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
-                schema: "dbo",
+                schema: "Auth",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -80,8 +119,24 @@ namespace Vocabu.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VerbalModes",
+                schema: "Ref",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Text = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Description = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Example = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VerbalModes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
-                schema: "dbo",
+                schema: "Auth",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -108,14 +163,35 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_Users_Countries_CountryId",
                         column: x => x.CountryId,
-                        principalSchema: "dbo",
+                        principalSchema: "Ref",
                         principalTable: "Countries",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
+                name: "Words",
+                schema: "Ref",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    LanguageId = table.Column<int>(type: "integer", nullable: false),
+                    Text = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Words", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Words_Languages_LanguageId",
+                        column: x => x.LanguageId,
+                        principalSchema: "Ref",
+                        principalTable: "Languages",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RoleClaims",
-                schema: "dbo",
+                schema: "Auth",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -130,7 +206,7 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_RoleClaims_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "dbo",
+                        principalSchema: "Auth",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -138,7 +214,7 @@ namespace Vocabu.DAL.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Scores",
-                schema: "dbo",
+                schema: "Data",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -152,22 +228,20 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_Scores_Games_GameId",
                         column: x => x.GameId,
-                        principalSchema: "dbo",
+                        principalSchema: "Ref",
                         principalTable: "Games",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Scores_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "dbo",
+                        principalSchema: "Auth",
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "UserClaims",
-                schema: "dbo",
+                schema: "Auth",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -182,7 +256,7 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_UserClaims_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "dbo",
+                        principalSchema: "Auth",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -190,7 +264,7 @@ namespace Vocabu.DAL.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserLogins",
-                schema: "dbo",
+                schema: "Auth",
                 columns: table => new
                 {
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
@@ -204,7 +278,7 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_UserLogins_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "dbo",
+                        principalSchema: "Auth",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -212,7 +286,7 @@ namespace Vocabu.DAL.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserRoles",
-                schema: "dbo",
+                schema: "Auth",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -224,14 +298,14 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_UserRoles_Roles_RoleId",
                         column: x => x.RoleId,
-                        principalSchema: "dbo",
+                        principalSchema: "Auth",
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserRoles_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "dbo",
+                        principalSchema: "Auth",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -239,7 +313,7 @@ namespace Vocabu.DAL.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserTokens",
-                schema: "dbo",
+                schema: "Auth",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -253,15 +327,74 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_UserTokens_Users_UserId",
                         column: x => x.UserId,
-                        principalSchema: "dbo",
+                        principalSchema: "Auth",
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
+                name: "Conjugations",
+                schema: "Ref",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    WordId = table.Column<int>(type: "integer", nullable: false),
+                    VerbalModeId = table.Column<int>(type: "integer", nullable: false),
+                    FirstSingular = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    SecondSingular = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    ThirdSingular = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    FirstPlural = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    SecondPlural = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    ThirdPlural = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
+                    NoPersonal = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Conjugations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Conjugations_VerbalModes_VerbalModeId",
+                        column: x => x.VerbalModeId,
+                        principalSchema: "Ref",
+                        principalTable: "VerbalModes",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Conjugations_Words_WordId",
+                        column: x => x.WordId,
+                        principalSchema: "Ref",
+                        principalTable: "Words",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WordsPartsOfSpeech",
+                schema: "Ref",
+                columns: table => new
+                {
+                    WordId = table.Column<int>(type: "integer", nullable: false),
+                    PartOfSpeechId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WordsPartsOfSpeech", x => new { x.WordId, x.PartOfSpeechId });
+                    table.ForeignKey(
+                        name: "FK_WordsPartsOfSpeech_PartsOfSpeech_PartOfSpeechId",
+                        column: x => x.PartOfSpeechId,
+                        principalSchema: "Ref",
+                        principalTable: "PartsOfSpeech",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_WordsPartsOfSpeech_Words_WordId",
+                        column: x => x.WordId,
+                        principalSchema: "Ref",
+                        principalTable: "Words",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ScoreTransactions",
-                schema: "dbo",
+                schema: "Data",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -275,194 +408,276 @@ namespace Vocabu.DAL.Migrations
                     table.ForeignKey(
                         name: "FK_ScoreTransactions_Scores_ScoreId",
                         column: x => x.ScoreId,
-                        principalSchema: "dbo",
+                        principalSchema: "Data",
                         principalTable: "Scores",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Conjugations_Id",
+                schema: "Ref",
+                table: "Conjugations",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Conjugations_VerbalModeId",
+                schema: "Ref",
+                table: "Conjugations",
+                column: "VerbalModeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Conjugations_WordId",
+                schema: "Ref",
+                table: "Conjugations",
+                column: "WordId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Countries_Id",
-                schema: "dbo",
+                schema: "Ref",
                 table: "Countries",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Games_Id",
-                schema: "dbo",
+                schema: "Ref",
                 table: "Games",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_JobLogs_Id",
-                schema: "dbo",
+                schema: "Config",
                 table: "JobLogs",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Languages_Id",
+                schema: "Ref",
+                table: "Languages",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PartsOfSpeech_Id",
+                schema: "Ref",
+                table: "PartsOfSpeech",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_Id",
-                schema: "dbo",
+                schema: "Auth",
                 table: "RoleClaims",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleClaims_RoleId",
-                schema: "dbo",
+                schema: "Auth",
                 table: "RoleClaims",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Roles_Id",
-                schema: "dbo",
+                schema: "Auth",
                 table: "Roles",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
-                schema: "dbo",
+                schema: "Auth",
                 table: "Roles",
                 column: "NormalizedName",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Scores_GameId",
-                schema: "dbo",
+                schema: "Data",
                 table: "Scores",
                 column: "GameId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Scores_Id",
-                schema: "dbo",
+                schema: "Data",
                 table: "Scores",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Scores_UserId",
-                schema: "dbo",
+                schema: "Data",
                 table: "Scores",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScoreTransactions_Id",
-                schema: "dbo",
+                schema: "Data",
                 table: "ScoreTransactions",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ScoreTransactions_ScoreId",
-                schema: "dbo",
+                schema: "Data",
                 table: "ScoreTransactions",
                 column: "ScoreId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_Id",
-                schema: "dbo",
+                schema: "Auth",
                 table: "UserClaims",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserClaims_UserId",
-                schema: "dbo",
+                schema: "Auth",
                 table: "UserClaims",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserLogins_UserId",
-                schema: "dbo",
+                schema: "Auth",
                 table: "UserLogins",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
-                schema: "dbo",
+                schema: "Auth",
                 table: "UserRoles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
-                schema: "dbo",
+                schema: "Auth",
                 table: "Users",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_CountryId",
-                schema: "dbo",
+                schema: "Auth",
                 table: "Users",
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Id",
-                schema: "dbo",
+                schema: "Auth",
                 table: "Users",
                 column: "Id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
-                schema: "dbo",
+                schema: "Auth",
                 table: "Users",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VerbalModes_Id",
+                schema: "Ref",
+                table: "VerbalModes",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Words_Id",
+                schema: "Ref",
+                table: "Words",
+                column: "Id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Words_LanguageId",
+                schema: "Ref",
+                table: "Words",
+                column: "LanguageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WordsPartsOfSpeech_PartOfSpeechId",
+                schema: "Ref",
+                table: "WordsPartsOfSpeech",
+                column: "PartOfSpeechId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Conjugations",
+                schema: "Ref");
+
+            migrationBuilder.DropTable(
                 name: "JobLogs",
-                schema: "dbo");
+                schema: "Config");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims",
-                schema: "dbo");
+                schema: "Auth");
 
             migrationBuilder.DropTable(
                 name: "ScoreTransactions",
-                schema: "dbo");
+                schema: "Data");
 
             migrationBuilder.DropTable(
                 name: "UserClaims",
-                schema: "dbo");
+                schema: "Auth");
 
             migrationBuilder.DropTable(
                 name: "UserLogins",
-                schema: "dbo");
+                schema: "Auth");
 
             migrationBuilder.DropTable(
                 name: "UserRoles",
-                schema: "dbo");
+                schema: "Auth");
 
             migrationBuilder.DropTable(
                 name: "UserTokens",
-                schema: "dbo");
+                schema: "Auth");
+
+            migrationBuilder.DropTable(
+                name: "WordsPartsOfSpeech",
+                schema: "Ref");
+
+            migrationBuilder.DropTable(
+                name: "VerbalModes",
+                schema: "Ref");
 
             migrationBuilder.DropTable(
                 name: "Scores",
-                schema: "dbo");
+                schema: "Data");
 
             migrationBuilder.DropTable(
                 name: "Roles",
-                schema: "dbo");
+                schema: "Auth");
+
+            migrationBuilder.DropTable(
+                name: "PartsOfSpeech",
+                schema: "Ref");
+
+            migrationBuilder.DropTable(
+                name: "Words",
+                schema: "Ref");
 
             migrationBuilder.DropTable(
                 name: "Games",
-                schema: "dbo");
+                schema: "Ref");
 
             migrationBuilder.DropTable(
                 name: "Users",
-                schema: "dbo");
+                schema: "Auth");
+
+            migrationBuilder.DropTable(
+                name: "Languages",
+                schema: "Ref");
 
             migrationBuilder.DropTable(
                 name: "Countries",
-                schema: "dbo");
+                schema: "Ref");
         }
     }
 }

@@ -7,7 +7,7 @@ public class Program
     // Add generator here to make it run
     private static readonly BaseGenerator[] GeneratorsToRun = [
         new CountriesGenerator(),
-        new EnglishWordsGenerator(),
+        new WordsTableGenerator()
     ];
 
     static async Task<int> Main() => await RunAllGenerators();

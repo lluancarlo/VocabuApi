@@ -12,15 +12,14 @@ using Vocabu.DAL.Contexts;
 namespace Vocabu.DAL.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20250417232704_AddWordsTable")]
-    partial class AddWordsTable
+    [Migration("20250522210237_AddFirstTables")]
+    partial class AddFirstTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("dbo")
                 .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -53,7 +52,7 @@ namespace Vocabu.DAL.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("Roles", "dbo");
+                    b.ToTable("Roles", "Auth");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -80,7 +79,7 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaims", "dbo");
+                    b.ToTable("RoleClaims", "Auth");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -107,7 +106,7 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaims", "dbo");
+                    b.ToTable("UserClaims", "Auth");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -128,7 +127,7 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogins", "dbo");
+                    b.ToTable("UserLogins", "Auth");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
@@ -143,7 +142,7 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles", "dbo");
+                    b.ToTable("UserRoles", "Auth");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -162,7 +161,67 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserTokens", "dbo");
+                    b.ToTable("UserTokens", "Auth");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.Conjugation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FirstPlural")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("FirstSingular")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("NoPersonal")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("SecondPlural")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("SecondSingular")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("ThirdPlural")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("ThirdSingular")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<int>("VerbalModeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("WordId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("VerbalModeId");
+
+                    b.HasIndex("WordId");
+
+                    b.ToTable("Conjugations", "Ref");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.Country", b =>
@@ -201,7 +260,7 @@ namespace Vocabu.DAL.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("Countries", "dbo");
+                    b.ToTable("Countries", "Ref");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.Game", b =>
@@ -227,7 +286,7 @@ namespace Vocabu.DAL.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("Games", "dbo");
+                    b.ToTable("Games", "Ref");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.JobLog", b =>
@@ -256,7 +315,59 @@ namespace Vocabu.DAL.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("JobLogs", "dbo");
+                    b.ToTable("JobLogs", "Config");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.Language", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Iso6391")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.Property<string>("Iso6392")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character varying(3)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Languages", "Ref");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.PartOfSpeech", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("PartsOfSpeech", "Ref");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.Score", b =>
@@ -285,7 +396,7 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Scores", "dbo");
+                    b.ToTable("Scores", "Data");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.ScoreTransaction", b =>
@@ -310,7 +421,7 @@ namespace Vocabu.DAL.Migrations
 
                     b.HasIndex("ScoreId");
 
-                    b.ToTable("ScoreTransactions", "dbo");
+                    b.ToTable("ScoreTransactions", "Data");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.User", b =>
@@ -389,7 +500,37 @@ namespace Vocabu.DAL.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("Users", "dbo");
+                    b.ToTable("Users", "Auth");
+                });
+
+            modelBuilder.Entity("Vocabu.DAL.Entities.VerbMode", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Example")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("VerbalModes", "Ref");
                 });
 
             modelBuilder.Entity("Vocabu.DAL.Entities.Word", b =>
@@ -400,7 +541,7 @@ namespace Vocabu.DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Language")
+                    b.Property<int>("LanguageId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Text")
@@ -413,78 +554,24 @@ namespace Vocabu.DAL.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
-                    b.ToTable("Words", "dbo");
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("Words", "Ref");
                 });
 
-            modelBuilder.Entity("Vocabu.DAL.Entities.WordAntonym", b =>
-                {
-                    b.Property<int>("MeaningId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("WordId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("integer");
-
-                    b.HasKey("MeaningId", "WordId");
-
-                    b.HasIndex("WordId");
-
-                    b.ToTable("WordAntonyms", "dbo");
-                });
-
-            modelBuilder.Entity("Vocabu.DAL.Entities.WordMeaning", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AudioUrl")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Definition")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Example")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("PartOfSpeech")
-                        .HasMaxLength(50)
-                        .HasColumnType("integer");
-
-                    b.Property<int>("WordId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id")
-                        .IsUnique();
-
-                    b.HasIndex("WordId");
-
-                    b.ToTable("WordMeanings", "dbo");
-                });
-
-            modelBuilder.Entity("Vocabu.DAL.Entities.WordSynonym", b =>
+            modelBuilder.Entity("Vocabu.DAL.Entities.WordPartOfSpeech", b =>
                 {
                     b.Property<int>("WordId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("MeaningId")
+                    b.Property<int>("PartOfSpeechId")
                         .HasColumnType("integer");
 
-                    b.HasKey("WordId", "MeaningId");
+                    b.HasKey("WordId", "PartOfSpeechId");
 
-                    b.HasIndex("MeaningId");
+                    b.HasIndex("PartOfSpeechId");
 
-                    b.ToTable("WordSynonyms", "dbo");
+                    b.ToTable("WordsPartsOfSpeech", "Ref");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -538,18 +625,37 @@ namespace Vocabu.DAL.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Vocabu.DAL.Entities.Conjugation", b =>
+                {
+                    b.HasOne("Vocabu.DAL.Entities.VerbMode", "VerbalMode")
+                        .WithMany()
+                        .HasForeignKey("VerbalModeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Vocabu.DAL.Entities.Word", "Word")
+                        .WithMany()
+                        .HasForeignKey("WordId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("VerbalMode");
+
+                    b.Navigation("Word");
+                });
+
             modelBuilder.Entity("Vocabu.DAL.Entities.Score", b =>
                 {
                     b.HasOne("Vocabu.DAL.Entities.Game", "Game")
                         .WithMany()
                         .HasForeignKey("GameId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Vocabu.DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Game");
@@ -562,7 +668,7 @@ namespace Vocabu.DAL.Migrations
                     b.HasOne("Vocabu.DAL.Entities.Score", "Score")
                         .WithMany()
                         .HasForeignKey("ScoreId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Score");
@@ -579,65 +685,34 @@ namespace Vocabu.DAL.Migrations
                     b.Navigation("Country");
                 });
 
-            modelBuilder.Entity("Vocabu.DAL.Entities.WordAntonym", b =>
-                {
-                    b.HasOne("Vocabu.DAL.Entities.WordMeaning", "WordMeaning")
-                        .WithMany("Antonyms")
-                        .HasForeignKey("MeaningId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Vocabu.DAL.Entities.Word", "Word")
-                        .WithMany()
-                        .HasForeignKey("WordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Word");
-
-                    b.Navigation("WordMeaning");
-                });
-
-            modelBuilder.Entity("Vocabu.DAL.Entities.WordMeaning", b =>
-                {
-                    b.HasOne("Vocabu.DAL.Entities.Word", "Word")
-                        .WithMany("WordMeanings")
-                        .HasForeignKey("WordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Word");
-                });
-
-            modelBuilder.Entity("Vocabu.DAL.Entities.WordSynonym", b =>
-                {
-                    b.HasOne("Vocabu.DAL.Entities.WordMeaning", "WordMeaning")
-                        .WithMany("Synonyms")
-                        .HasForeignKey("MeaningId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Vocabu.DAL.Entities.Word", "Word")
-                        .WithMany()
-                        .HasForeignKey("WordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Word");
-
-                    b.Navigation("WordMeaning");
-                });
-
             modelBuilder.Entity("Vocabu.DAL.Entities.Word", b =>
                 {
-                    b.Navigation("WordMeanings");
+                    b.HasOne("Vocabu.DAL.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Language");
                 });
 
-            modelBuilder.Entity("Vocabu.DAL.Entities.WordMeaning", b =>
+            modelBuilder.Entity("Vocabu.DAL.Entities.WordPartOfSpeech", b =>
                 {
-                    b.Navigation("Antonyms");
+                    b.HasOne("Vocabu.DAL.Entities.PartOfSpeech", "PartOfSpeech")
+                        .WithMany()
+                        .HasForeignKey("PartOfSpeechId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
-                    b.Navigation("Synonyms");
+                    b.HasOne("Vocabu.DAL.Entities.Word", "Word")
+                        .WithMany()
+                        .HasForeignKey("WordId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("PartOfSpeech");
+
+                    b.Navigation("Word");
                 });
 #pragma warning restore 612, 618
         }

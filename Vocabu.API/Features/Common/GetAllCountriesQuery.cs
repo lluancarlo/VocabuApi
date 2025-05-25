@@ -7,11 +7,11 @@ namespace Vocabu.API.Features.Common;
 
 public class GetAllCountriesQuery : IRequest<ApiResponse>
 {
-    public class GetAllCountriesHandler : IRequestHandler<GetAllCountriesQuery, ApiResponse>
+    public class GetAllCountriesQueryHandler : IRequestHandler<GetAllCountriesQuery, ApiResponse>
     {
         public readonly IRepository<Country> _countryRepo;
 
-        public GetAllCountriesHandler(IRepository<Country> countryRepo)
+        public GetAllCountriesQueryHandler(IRepository<Country> countryRepo)
         {
             _countryRepo = countryRepo;
         }

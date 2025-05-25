@@ -9,10 +9,12 @@ public class GeneratorDbContext : IdentityDbContext<User, IdentityRole<Guid>, Gu
 {
     #region DBSets
     public DbSet<Country> Countries { get; set; }
+    public DbSet<Game> Games { get; set; }
+    public DbSet<Language> Languages { get; set; }
+    public DbSet<PartOfSpeech> PartsOfSpeech { get; set; }
     public DbSet<Word> Words { get; set; }
-    public DbSet<WordMeaning> WordMeanings { get; set; }
-    public DbSet<WordSynonym> WordSynonyms { get; set; }
-    public DbSet<WordAntonym> WordAntonyms { get; set; }
+    public DbSet<VerbMode> VerbalModes { get; set; }
+    public DbSet<Conjugation> Conjugations { get; set; }
     #endregion
 
     public GeneratorDbContext(DbContextOptions<GeneratorDbContext> options) : base(options)
@@ -23,16 +25,20 @@ public class GeneratorDbContext : IdentityDbContext<User, IdentityRole<Guid>, Gu
     {
         base.OnModelCreating(builder);
 
-        builder.HasDefaultSchema("dbo");
+        builder.HasDefaultSchema("Ref");
 
         builder.Entity<Country>(e =>
         {
             e.ToTable("Countries");
+
+            // PrimaryKey
             e.HasKey(p => p.Id);
             e.HasIndex(p => p.Id)
                 .IsUnique();
             e.Property(p => p.Id)
                 .ValueGeneratedOnAdd();
+
+            // Columns
             e.Property(p => p.Name)
                 .IsRequired()
                 .HasMaxLength(50);
@@ -49,69 +55,198 @@ public class GeneratorDbContext : IdentityDbContext<User, IdentityRole<Guid>, Gu
                 .IsRequired();
         });
 
-        builder.Entity<Word>(e =>
+        builder.Entity<Game>(e =>
         {
-            e.ToTable("Words");
+            e.ToTable("Games");
+
+            // PrimaryKey
             e.HasKey(p => p.Id);
             e.HasIndex(p => p.Id)
                 .IsUnique();
             e.Property(p => p.Id)
                 .ValueGeneratedOnAdd();
+
+            // Columns
+            e.Property(p => p.Name)
+                .IsRequired()
+                .HasMaxLength(50);
+            e.Property(p => p.Description)
+                .IsRequired()
+                .HasMaxLength(50);
+        });
+
+        builder.Entity<Language>(e =>
+        {
+            e.ToTable("Languages");
+
+            // PrimaryKey
+            e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+
+            // Columns
             e.Property(p => p.Text)
                 .IsRequired()
                 .HasMaxLength(20);
-            e.Property(p => p.Language)
-                .IsRequired();
+            e.Property(p => p.Iso6391)
+                .IsRequired()
+                .HasMaxLength(2);
+            e.Property(p => p.Iso6392)
+                .IsRequired()
+                .HasMaxLength(3);
         });
 
-        builder.Entity<WordMeaning>(e =>
+        builder.Entity<PartOfSpeech>(e =>
         {
-            e.ToTable("WordMeanings");
+            e.ToTable("PartsOfSpeech");
+
+            // PrimaryKey
             e.HasKey(p => p.Id);
             e.HasIndex(p => p.Id)
                 .IsUnique();
             e.Property(p => p.Id)
                 .ValueGeneratedOnAdd();
-            e.Property(p => p.PartOfSpeech)
+
+            // Columns
+            e.Property(p => p.Text)
+                .IsRequired()
+                .HasMaxLength(20);
+        });
+
+        builder.Entity<Word>(e =>
+        {
+            e.ToTable("Words");
+
+            // PrimaryKey
+            e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+
+            // ForeignKey
+            e.HasOne(h => h.Language)
+                .WithMany()
+                .HasForeignKey(h => h.LanguageId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
+
+            // Columns
+            e.Property(p => p.Text)
+                .IsRequired()
+                .HasMaxLength(20);
+        });
+
+        builder.Entity<WordPartOfSpeech>(e =>
+        {
+            e.ToTable("WordsPartsOfSpeech");
+
+            // PrimaryKey
+            e.HasKey(p => new { p.WordId, p.PartOfSpeechId });
+
+            // ForeignKey
+            e.HasOne(h => h.Word)
+                .WithMany()
+                .HasForeignKey(h => h.WordId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
+            e.HasOne(h => h.PartOfSpeech)
+                .WithMany()
+                .HasForeignKey(h => h.PartOfSpeechId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
+        });
+
+        builder.Entity<VerbMode>(e =>
+        {
+            e.ToTable("VerbModes");
+
+            // PrimaryKey
+            e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+
+            // Columns
+            e.Property(p => p.Text)
+                .IsRequired()
+                .HasMaxLength(20);
+            e.Property(p => p.Description)
+                .IsRequired()
+                .HasMaxLength(100);
+            e.Property(p => p.Example)
+                .HasMaxLength(100);
+        });
+
+        builder.Entity<VerbTense>(e =>
+        {
+            e.ToTable("VerbTenses");
+
+            // PrimaryKey
+            e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+
+            // Columns
+            e.Property(p => p.Text)
                 .IsRequired()
                 .HasMaxLength(50);
-            e.Property(p => p.Definition)
-                .IsRequired();
+            e.Property(p => p.Description)
+                .IsRequired()
+                .HasMaxLength(100);
             e.Property(p => p.Example)
-                .HasMaxLength(200);
-            e.Property(p => p.AudioUrl)
-                .HasMaxLength(200);
-            e.HasOne(p => p.Word)
-                .WithMany(p => p.WordMeanings)
-                .HasForeignKey(p => p.WordId);
+                .HasMaxLength(100);
         });
 
-        builder.Entity<WordSynonym>(e =>
+        builder.Entity<Conjugation>(e =>
         {
-            e.ToTable("WordSynonyms");
-            e.HasKey(p => new { p.WordId, p.MeaningId });
+            e.ToTable("Conjugations");
 
-            e.HasOne(p => p.WordMeaning)
-                .WithMany(p => p.Synonyms)
-                .HasForeignKey(p => p.MeaningId);
+            // PrimaryKey
+            e.HasKey(p => p.Id);
+            e.HasIndex(p => p.Id)
+                .IsUnique();
+            e.Property(p => p.Id)
+                .ValueGeneratedOnAdd();
 
-            e.HasOne(p => p.Word)
+            // ForeignKey
+            e.HasOne(h => h.Word)
                 .WithMany()
-                .HasForeignKey(p => p.WordId);
-        });
-
-        builder.Entity<WordAntonym>(e =>
-        {
-            e.ToTable("WordAntonyms");
-            e.HasKey(p => new { p.MeaningId, p.WordId });
-
-            e.HasOne(p => p.WordMeaning)
-                .WithMany(p => p.Antonyms)
-                .HasForeignKey(p => p.MeaningId);
-
-            e.HasOne(p => p.Word)
+                .HasForeignKey(h => h.WordId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
+            e.HasOne(h => h.VerbalMode)
                 .WithMany()
-                .HasForeignKey(p => p.WordId);
+                .HasForeignKey(h => h.VerbalModeId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired();
+
+            // Columns
+            e.Property(p => p.FirstSingular)
+                .IsRequired()
+                .HasMaxLength(30);
+            e.Property(p => p.SecondSingular)
+                .IsRequired()
+                .HasMaxLength(30);
+            e.Property(p => p.ThirdSingular)
+                .IsRequired()
+                .HasMaxLength(30);
+            e.Property(p => p.FirstPlural)
+                .IsRequired()
+                .HasMaxLength(30);
+            e.Property(p => p.SecondPlural)
+                .IsRequired()
+                .HasMaxLength(30);
+            e.Property(p => p.ThirdPlural)
+                .IsRequired()
+                .HasMaxLength(30);
+            e.Property(p => p.NoPersonal)
+                .HasMaxLength(30);
         });
     }
 }

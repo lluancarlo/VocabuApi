@@ -5,15 +5,14 @@ using static Vocabu.Domain.Enums;
 
 namespace BigGenerator.Generators;
 
-public class EnglishWordsGenerator : BaseGenerator
+public class WordsTableGenerator : BaseGenerator
 {
     private const string PathFileToRead = "WordLists/english.txt";
-    private const Languages FileLanguage = Languages.English;
 
     public override async Task<GeneratorResponse> Run()
     {
-        if (Context.Words.AsNoTracking().Any())
-            return GeneratorResponse.Ok("Words table is not empty, skipping generator ...");
+        //if (Context.Words.AsNoTracking().Any())
+        //    return GeneratorResponse.Ok("Words table is not empty, skipping generator ...");
 
         try
         {
@@ -28,8 +27,7 @@ public class EnglishWordsGenerator : BaseGenerator
             foreach (string item in englishWorlds)
                 wordList.Add(new Word
                 {
-                    Text = item,
-                    Language = FileLanguage,
+                    Text = item
                 });
 
             await Context.Words.AddRangeAsync(wordList);
