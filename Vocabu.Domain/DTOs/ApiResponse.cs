@@ -36,13 +36,13 @@ public class ApiResponse
         new() { Success = false, Message = message, StatusCode = (int)statusCode };
 }
 
-public class CommandResponse<T> : ApiResponse
+public class ApiResponse<T> : ApiResponse
 {
     public T? Data { get; set; }
 
-    public static CommandResponse<T> Ok(T data, string? message = null) =>
+    public static ApiResponse<T> Ok(T data, string? message = null) =>
         new() { Success = true, Message = message, Data = data, StatusCode = (int)HttpStatusCode.OK };
 
-    public static new CommandResponse<T> Error(string message, HttpStatusCode statusCode) =>
+    public static new ApiResponse<T> Error(string message, HttpStatusCode statusCode) =>
         new() { Success = false, Message = message, StatusCode = (int)statusCode };
 }

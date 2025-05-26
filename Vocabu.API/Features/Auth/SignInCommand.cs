@@ -69,7 +69,7 @@ public class SignInCommand : IRequest<ApiResponse>
             if (!serviceReponse.Success)
                 return ApiResponse.Error("Error while login: " + result.ToString(), System.Net.HttpStatusCode.InternalServerError);
 
-            return CommandResponse<string>.Ok(serviceReponse.Data!, "Login completed successfully.");
+            return ApiResponse<string>.Ok(serviceReponse.Data!, "Login completed successfully.");
         }
     }
 

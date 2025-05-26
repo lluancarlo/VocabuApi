@@ -18,7 +18,7 @@ public class ProfileController : ControllerBase
     }
 
     [HttpPost("ChangePassword")]
-    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command)
+    public async Task<IActionResult> ChangePassword([FromBody] UpdatePlayerCommand command)
     {
         var commandResult = await _mediator.Send(command);
         return StatusCode(commandResult.StatusCode, commandResult);

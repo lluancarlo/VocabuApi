@@ -7,13 +7,13 @@ using Vocabu.DAL.Entities;
 
 namespace Vocabu.API.Features.Profile;
 
-public class ChangePasswordCommand : IRequest<ApiResponse>
+public class UpdatePlayerCommand : IRequest<ApiResponse>
 {
     public required string Email { get; set; }
     public required string CurrentPassword { get; set; }
     public required string NewPassword { get; set; }
 
-    public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordCommand, ApiResponse>
+    public class ChangePasswordCommandHandler : IRequestHandler<UpdatePlayerCommand, ApiResponse>
     {
         private readonly SignInManager<User> signInManager;
         private readonly UserManager<User> userManager;
@@ -25,7 +25,7 @@ public class ChangePasswordCommand : IRequest<ApiResponse>
             userManager = _userManager;
         }
 
-        public async Task<ApiResponse> Handle(ChangePasswordCommand command, CancellationToken ct)
+        public async Task<ApiResponse> Handle(UpdatePlayerCommand command, CancellationToken ct)
         {
             var validatorResult = new ChangePasswordCommandValidator().Validate(command);
             if (!validatorResult.IsValid)
@@ -53,7 +53,7 @@ public class ChangePasswordCommand : IRequest<ApiResponse>
         }
     }
 
-    public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCommand>
+    public class ChangePasswordCommandValidator : AbstractValidator<UpdatePlayerCommand>
     {
         public ChangePasswordCommandValidator()
         {

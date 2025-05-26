@@ -17,6 +17,6 @@ public class GetAllCountriesQuery : IRequest<ApiResponse>
         }
 
         public async Task<ApiResponse> Handle(GetAllCountriesQuery request, CancellationToken ct) =>
-            CommandResponse<IEnumerable<Country>>.Ok(await _countryRepo.GetAllAsync(false));
+            ApiResponse<IEnumerable<Country>>.Ok(await _countryRepo.GetAllAsync(false));
     }
 }

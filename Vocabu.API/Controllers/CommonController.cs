@@ -29,11 +29,4 @@ public class CommonController : ControllerBase
         var commandResult = await _mediator.Send(new GetAllCountriesQuery());
         return StatusCode(commandResult.StatusCode, commandResult);
     }
-
-    [HttpGet("GetWord")]
-    public async Task<IActionResult> GetWordAsync([FromQuery] GetWordQuery query)
-    {
-        var commandResult = await _mediator.Send(query);
-        return StatusCode(commandResult.StatusCode, commandResult);
-    }
 }

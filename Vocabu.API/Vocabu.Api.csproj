@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Vocabu.DAL\Vocabu.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Game\" />
+  </ItemGroup>
+
 </Project>

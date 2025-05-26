@@ -8,4 +8,5 @@ public class Word : ImmutableEntity
     public Language? Language { get; set; }
 
     public required string Text { get; set; }
+    public string? ImageUrl { get; set; }
 }
