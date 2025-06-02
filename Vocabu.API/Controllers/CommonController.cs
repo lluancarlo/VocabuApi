@@ -1,10 +1,14 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Vocabu.API.Common;
 using Vocabu.API.Features.Common;
 
 namespace Vocabu.API.Controllers;
 
+#if DEBUG
+[AllowAnonymous]
+#endif
 [ApiController]
 [Route("api/[controller]")]
 public class CommonController : ControllerBase

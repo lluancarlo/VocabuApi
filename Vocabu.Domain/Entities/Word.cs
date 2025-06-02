@@ -5,7 +5,7 @@ namespace Vocabu.DAL.Entities;
 public class Word : ImmutableEntity
 {
     public int LanguageId { get; set; }
-    public Language? Language { get; set; }
+    public virtual Language? Language { get; set; }
 
     public required string Text { get; set; }
     public string? ImageUrl { get; set; }

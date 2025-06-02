@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Vocabu.API.Common;
 using Vocabu.API.Features.Common;
+using Vocabu.API.Features.Player;
 
 namespace Vocabu.API.Controllers;
 
@@ -16,10 +17,17 @@ public class GameController : ControllerBase
         _mediator = mediator;
     }
 
+    //[HttpGet("GetArticles")]
+    //public async Task<IActionResult> GetArticlesAsync(GetPrepositionsQuery query)
+    //{
+    //    var commandResult = await _mediator.Send(query);
+    //    return StatusCode(commandResult.StatusCode, commandResult);
+    //}
+
     [HttpGet("GetPrepositions")]
-    public async Task<IActionResult> GetPrepositionsAsync()
+    public async Task<IActionResult> GetPrepositionsAsync([FromQuery] GetPrepositionsQuery query)
     {
-        var commandResult = await _mediator.Send(new GetAllCountriesQuery());
+        var commandResult = await _mediator.Send(query);
         return StatusCode(commandResult.StatusCode, commandResult);
     }
 }

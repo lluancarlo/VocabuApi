@@ -19,14 +19,14 @@ public class PlayerController : ControllerBase
     }
 
     [HttpGet("GetPlayer")]
-    public async Task<IActionResult> GetPlayerAsync(GetPlayerQuery query)
+    public async Task<IActionResult> GetPlayerAsync([FromQuery] GetPlayerQuery query)
     {
         var commandResult = await _mediator.Send(query);
         return StatusCode(commandResult.StatusCode, commandResult);
     }
 
     [HttpPost("AddPlayerExperience")]
-    public async Task<IActionResult> AddPlayerExperience(AddPlayerExperienceCommand command)
+    public async Task<IActionResult> AddPlayerExperience([FromBody] AddPlayerExperienceCommand command)
     {
         var commandResult = await _mediator.Send(command);
         return StatusCode(commandResult.StatusCode, commandResult);
