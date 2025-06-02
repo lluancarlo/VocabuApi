@@ -26,6 +26,7 @@ public class ApiDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 
             // PrimaryKey
             e.HasKey(p => p.Id);
+            e.Property(p => p.Id);
             e.HasIndex(p => p.Id)
                 .IsUnique();
 
@@ -170,9 +171,9 @@ public class ApiDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
                 .HasMaxLength(256);
         });
 
-        builder.Entity<WordTypeOfSpeech>(e =>
+        builder.Entity<WordPreposition>(e =>
         {
-            e.ToTable("WordTypesOfSpeech");
+            e.ToTable("WordPrepositions");
 
             // PrimaryKey
             e.HasKey(p => p.Id);
@@ -188,7 +189,9 @@ public class ApiDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Columns
-            e.Property(p => p.PartOfSpeech)
+            e.Property(p => p.Type)
+                .IsRequired();
+            e.Property(p => p.Example)
                 .IsRequired();
         });
     }

@@ -9,32 +9,49 @@ namespace Vocabu.API.Features.Player;
 
 public class GetPrepositionsQuery : IRequest<ApiResponse>
 {
-    public Guid Id { get; set; }
+    public int LanguageId { get; set; }
 
     public class GetPrepositionsQueryHandler : IRequestHandler<GetPrepositionsQuery, ApiResponse>
     {
         private readonly ILogger<GetPrepositionsQueryHandler> _log;
-        private readonly IRepository<WordTypeOfSpeech> _wordTypeOfSpeechRepo;
+        private readonly IRepository<WordPreposition> _wordPrepositionRepo;
 
         public GetPrepositionsQueryHandler(ILogger<GetPrepositionsQueryHandler> loggerService, 
-                IRepository<WordTypeOfSpeech> wordRepo)
+                IRepository<WordPreposition> wordRepo)
         {
             _log = loggerService;
-            _wordTypeOfSpeechRepo = wordRepo;
+            _wordPrepositionRepo = wordRepo;
         }
 
         public async Task<ApiResponse> Handle(GetPrepositionsQuery request, CancellationToken ct)
         {
-            List<PrepositionWordToImage> lista = new List<PrepositionWordToImage>();
+            var listPrepositionsReturn = new List<PrepositionWord>();
 
-            var listPrepositionWords = await _wordTypeOfSpeechRepo.AsQueryable().AsNoTracking()
+            var listWordPrepositions = await _wordPrepositionRepo.AsQueryable().AsNoTracking()
                 .Include(i => i.Word)
-                .FirstOrDefaultAsync(f => f.PartOfSpeech == Domain.Enums.PartsOfSpeech.Preposition);    
+                .Where(w => w.Word.LanguageId == request.LanguageId)
+                .ToListAsync();
 
-            if (listPrepositionWords == null)
-                _log.LogError(string.Format("GetPrepositionsQuery is null for request: Id={0}", request.Id));
+            var rnd = new Random();
+            listWordPrepositions = listWordPrepositions.OrderBy(i => rnd.Next()).Take(4).ToList();
 
-            return ApiResponse<IEnumerable<PrepositionWordToImage>>.Ok(lista);
+            for (int i = 0; i < listWordPrepositions.Count; i++)
+            {
+                var word = PrepositionWord.FromWordEntity(listWordPrepositions[i].Word!);
+
+                if (i == 0)
+                    word.isCorrect = true;
+
+                listPrepositionsReturn.Add(word);
+            }
+
+            if (listPrepositionsReturn.Count == 0)
+            {
+                _log.LogError(string.Format("GetPrepositionsQuery is null for request: Id={0}", request.LanguageId));
+                return ApiResponse.BadRequest("Id not found");
+            }
+
+            return ApiResponse<IEnumerable<PrepositionWord>>.Ok(listPrepositionsReturn);
         }
     }
 }

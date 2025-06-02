@@ -30,5 +30,15 @@ public static class Enums
         Modal = 12
     }
 
+    public enum PrepositionType
+    {
+        Position = 0,
+        Direction = 1,
+        Localition = 2,
+        Time = 3,
+        from = 4,
+        to = 5
+    }
+
     public static T GetEnumByName<T>(string name) => (T)Enum.Parse(typeof(T), name.Trim());
 }
